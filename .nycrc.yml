@@ -1,1 +1,1 @@
-extends: node_modules/@handy-common-utils/dev-dependencies/.nycrc.yml
+extends: node_modules/@handy-common-utils/dev-utils/.nycrc.yml
