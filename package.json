@@ -1,0 +1,45 @@
+{
+  "name": "@handy-common-utils/aws-utils",
+  "version": "1.0.0",
+  "description": "AWS related utilities",
+  "scripts": {
+    "pretest": "eslint . --ext .ts",
+    "test": "nyc mocha -r ts-node/register test/**/*spec.ts",
+    "prepare": "shx rm -rf dist && tsc",
+    "preversion": "generate-api-docs-and-update-readme && git add README.md"
+  },
+  "files": [
+    "package.json",
+    "dist"
+  ],
+  "main": "dist/aws-utils.js",
+  "types": "dist/aws-utils.d.ts",
+  "bin": {},
+  "dependencies": {
+    "@handy-common-utils/promise-utils": "^1.0.3",
+    "@unbounce/parse-aws-arn": "^1.2.1"
+  },
+  "devDependencies": {
+    "@handy-common-utils/dev-dependencies": "^1.0.7",
+    "@types/node": "^10.17.44"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/handy-common-utils/aws-utils#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/handy-common-utils/aws-utils.git"
+  },
+  "bugs": {
+    "url": "https://github.com/handy-common-utils/aws-utils/issues"
+  },
+  "keywords": [
+    "aws",
+    "common",
+    "utils",
+    "utilities"
+  ],
+  "author": "James Hu",
+  "license": "Apache-2.0"
+}
