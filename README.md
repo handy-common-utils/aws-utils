@@ -13,19 +13,18 @@ npm install @handy-common-utils/aws-utils
 Then you can use it in the code:
 
 ```javascript
-import { FsUtils } from 'fs-utils';
+import { AwsUtils } from '@handy-common-utils/aws-utils';
 
-const [,, filePath, matchPattern, beforeString, afterString] = process.argv;
-await FsUtils.addSurroundingInFile(filePath, new RegExp(matchPattern), beforeString, afterString);
+const domainNameObjects = await AwsUtils.repeatFetchingItemsByPosition(
+  pagingParam => apig.getDomainNames({ limit: 100, ...pagingParam }).promise(),
+);
 ```
 
 You can either import and use the [class](#classes) as shown above,
 or you can import individual [functions](#variables) directly like below:
 
 ```javascript
-import { addSurroundingInFile } from 'fs-utils';
-
-await addSurroundingInFile(README_MD_FILE, /<example>(.*?)<\/example>/gms, '<example><b>', '</b></example>');
+import { repeatFetchingItemsByNextToken, repeatFetchingItemsByMarker, parseArn } from '@handy-common-utils/aws-utils';
 ```
 
 # API
