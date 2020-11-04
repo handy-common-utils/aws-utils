@@ -1,0 +1,9 @@
+{
+  "ecmaVersion": "es2017",
+  "module": false,
+  "allowHashBang": true,
+  "files": "./dist/**/*.js",
+  "not": [
+    "./dist/bin"
+  ]
+}
