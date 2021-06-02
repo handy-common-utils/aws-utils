@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@handy-common-utils/dev-dependencies": "^1.0.14",
+    "aws-sdk": "^2.919.0",
     "es-check": "^5.2.3"
   },
   "publishConfig": {
