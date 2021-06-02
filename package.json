@@ -16,7 +16,7 @@
   "types": "dist/aws-utils.d.ts",
   "bin": {},
   "dependencies": {
-    "@handy-common-utils/promise-utils": "^1.1.0",
+    "@handy-common-utils/promise-utils": "^1.1.1",
     "@unbounce/parse-aws-arn": "^1.2.2"
   },
   "devDependencies": {
