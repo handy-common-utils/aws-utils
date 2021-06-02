@@ -1,6 +1,9 @@
+/* eslint-disable unicorn/prefer-spread */
+/* eslint-disable unicorn/no-null */
 import { PromiseUtils } from '@handy-common-utils/promise-utils';
 import { parseArn as simpleParseArn } from '@unbounce/parse-aws-arn';
 
+// eslint-disable-next-line unicorn/no-static-only-class
 export abstract class AwsUtils {
   /**
    * Fetch items by position repeatedly.
