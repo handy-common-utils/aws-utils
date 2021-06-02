@@ -141,4 +141,5 @@ export abstract class AwsUtils {
 export const repeatFetchingItemsByPosition = AwsUtils.repeatFetchingItemsByPosition;
 export const repeatFetchingItemsByNextToken = AwsUtils.repeatFetchingItemsByNextToken;
 export const repeatFetchingItemsByMarker = AwsUtils.repeatFetchingItemsByMarker;
+export const withRetry = AwsUtils.withRetry;
 export const parseArn = AwsUtils.parseArn;
