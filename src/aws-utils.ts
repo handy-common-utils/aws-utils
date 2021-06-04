@@ -96,7 +96,8 @@ export abstract class AwsUtils {
    * @param operation the AWS operation that returns a Promise, such like `() => apig.getBasePathMappings({ domainName, limit: 500 }).promise()`
    * @param backoff Array of retry backoff periods (unit: milliseconds) or function for calculating them.
    *                If retry is desired, before making next call to the operation the desired backoff period would be waited.
-   *                If the array runs out of elements or the function returns `undefined`, there would be no further call to the operation.
+   *                If the array runs out of elements or the function returns `undefined` or either the array or the function returns a negative number,
+   *                there would be no further call to the operation.
    *                The `attempt` argument passed into backoff function starts from 2 because only retries need to backoff,
    *                so the first retry is the second attempt.
    *                If ommitted or undefined, a default backoff array will be used.
@@ -115,7 +116,7 @@ export abstract class AwsUtils {
       const backoffMs = Array.isArray(backoff) ? backoff[attempt - 1] : backoff(attempt, previousResult, previousError);
       const awsError = previousError as unknown as AWSError;
       const awsRetryDelaySec = awsError?.retryDelay;
-      if (backoffMs == null || awsRetryDelaySec == null) {  // if there should be no retry or if AWS does not tell us the delay
+      if (backoffMs == null || backoffMs < 0 || awsRetryDelaySec == null) {  // if there should be no retry or if AWS does not tell us the delay
         return backoffMs;
       }
       const awsRetryDelayMs = awsRetryDelaySec * 1000;
