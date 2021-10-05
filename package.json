@@ -4,8 +4,8 @@
   "description": "AWS related utilities",
   "scripts": {
     "pretest": "eslint . --ext .ts",
-    "test": "nyc mocha -r ts-node/register test/**/*spec.ts",
-    "prepare": "shx rm -rf dist && tsc",
+    "test": "nyc mocha",
+    "prepare": "shx rm -rf dist && tsc && es-check",
     "preversion": "generate-api-docs-and-update-readme && git add README.md"
   },
   "files": [
@@ -20,7 +20,7 @@
     "@unbounce/parse-aws-arn": "^1.2.2"
   },
   "devDependencies": {
-    "@handy-common-utils/dev-dependencies": "^1.0.14",
+    "@handy-common-utils/dev-dependencies": "^1.0.20",
     "aws-sdk": "^2.919.0",
     "es-check": "^5.2.3"
   },
