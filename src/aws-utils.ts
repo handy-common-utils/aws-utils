@@ -11,6 +11,24 @@ export const FIBONACCI_SEQUENCE_BACKOFFS = [...FIBONACCI_SEQUENCE, -1];
 // eslint-disable-next-line unicorn/no-static-only-class
 export abstract class AwsUtils {
   /**
+   * Build an object that can be passed into `DynamoDB.DocumentClient(...)` for
+   * DynamoDB Local (https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html)
+   * 
+   * @example
+   * const ddbClient = new DynamoDB.DocumentClient(process.env.IS_OFFLINE === 'true' ? AwsUtils.dynamodbLocalClientOptions() : undefined);
+   * 
+   * @param endpoint if omitted, the endpoint will be 'http://localhost:8000' which is the default
+   * @returns the options object
+   */
+  static dynamodbLocalClientOptions(endpoint = 'http://localhost:8000') {
+    return {
+      endpoint,
+      region: 'ap-southeast-2',
+      accessKeyId: 'FAKE_ACCESS_KEY',
+      secretAccessKey: 'FAKE_SECRET',
+    };
+  }
+  /**
    * Fetch items by position repeatedly.
    * This function is useful for client side pagination when the response from AWS API contains position and items fields.
    *
@@ -195,3 +213,4 @@ export const withRetry = AwsUtils.withRetry;
 export const promiseWithRetry = AwsUtils.promiseWithRetry;
 export const fibonacciRetryConfigurationOptions = AwsUtils.fibonacciRetryConfigurationOptions;
 export const parseArn = AwsUtils.parseArn;
+export const dynamodbLocalClientOptions = AwsUtils.dynamodbLocalClientOptions;
