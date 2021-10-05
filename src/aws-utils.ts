@@ -13,10 +13,10 @@ export abstract class AwsUtils {
   /**
    * Build an object that can be passed into `DynamoDB.DocumentClient(...)` for
    * DynamoDB Local (https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html)
-   * 
+   *
    * @example
    * const ddbClient = new DynamoDB.DocumentClient(process.env.IS_OFFLINE === 'true' ? AwsUtils.dynamodbLocalClientOptions() : undefined);
-   * 
+   *
    * @param endpoint if omitted, the endpoint will be 'http://localhost:8000' which is the default
    * @returns the options object
    */
@@ -28,6 +28,7 @@ export abstract class AwsUtils {
       secretAccessKey: 'FAKE_SECRET',
     };
   }
+
   /**
    * Fetch items by position repeatedly.
    * This function is useful for client side pagination when the response from AWS API contains position and items fields.
