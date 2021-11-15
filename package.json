@@ -16,11 +16,11 @@
   "types": "dist/aws-utils.d.ts",
   "bin": {},
   "dependencies": {
-    "@handy-common-utils/promise-utils": "^1.1.1",
+    "@handy-common-utils/promise-utils": "^1.2.4",
     "@unbounce/parse-aws-arn": "^1.2.2"
   },
   "devDependencies": {
-    "@handy-common-utils/dev-dependencies": "^1.0.20",
+    "@handy-common-utils/dev-dependencies": "^1.0.31",
     "aws-sdk": "^2.919.0",
     "es-check": "^5.2.3"
   },

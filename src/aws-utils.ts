@@ -1,14 +1,13 @@
 /* eslint-disable unicorn/prefer-spread */
-/* eslint-disable unicorn/no-null */
 import { PromiseUtils } from '@handy-common-utils/promise-utils';
 import { AWSError } from 'aws-sdk';
 import { parseArn as simpleParseArn } from '@unbounce/parse-aws-arn';
+// eslint-disable-next-line node/no-missing-import
 import { ConfigurationOptions } from 'aws-sdk/lib/config-base';
 
 export const FIBONACCI_SEQUENCE = [1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946, 17711, 28657, 46368, 75025, 121393, 196418, 317811];
 export const FIBONACCI_SEQUENCE_BACKOFFS = [...FIBONACCI_SEQUENCE, -1];
 
-// eslint-disable-next-line unicorn/no-static-only-class
 export abstract class AwsUtils {
   /**
    * Build an object that can be passed into `DynamoDB.DocumentClient(...)` for
