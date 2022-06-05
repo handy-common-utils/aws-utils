@@ -6,7 +6,7 @@
     "pretest": "eslint . --ext .ts",
     "test": "nyc mocha",
     "prepare": "shx rm -rf dist && tsc && es-check",
-    "preversion": "generate-api-docs-and-update-readme && replace-in-file README.md '[^#]### Functions[\\s\\S]*?## Classes' '## Classes' && git add README.md"
+    "preversion": "generate-api-docs-and-update-readme && git add README.md"
   },
   "files": [
     "package.json",
