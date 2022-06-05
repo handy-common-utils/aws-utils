@@ -37,31 +37,26 @@ import { repeatFetchingItemsByNextToken, repeatFetchingItemsByMarker, parseArn }
 <!-- API start -->
 <a name="readmemd"></a>
 
-@handy-common-utils/aws-utils
-
 ## @handy-common-utils/aws-utils
 
-### Table of contents
-
-#### Classes
-
-- [AwsUtils](#classesawsutilsmd)
-
-#### Variables
-
-- [FIBONACCI\_SEQUENCE](#fibonacci_sequence)
-- [FIBONACCI\_SEQUENCE\_BACKOFFS](#fibonacci_sequence_backoffs)
+### Re-exports
 
 #### Functions
 
-- [dynamodbLocalClientOptions](#dynamodblocalclientoptions)
-- [fibonacciRetryConfigurationOptions](#fibonacciretryconfigurationoptions)
-- [parseArn](#parsearn)
-- [promiseWithRetry](#promisewithretry)
-- [repeatFetchingItemsByMarker](#repeatfetchingitemsbymarker)
-- [repeatFetchingItemsByNextToken](#repeatfetchingitemsbynexttoken)
-- [repeatFetchingItemsByPosition](#repeatfetchingitemsbyposition)
-- [withRetry](#withretry)
+- [fetchAllByNextToken = AwsUtils.fetchAllByNextToken](#fetchAllByNextToken)
+- [fetchAllByMarker = AwsUtils.fetchAllByMarker](#fetchAllByMarker)
+- [fetchAllByExclusiveStartKey = AwsUtils.fetchAllByExclusiveStartKey](#fetchAllByExclusiveStartKey)
+- [withRetry = AwsUtils.withRetry](#withRetry)
+- [promiseWithRetry = AwsUtils.promiseWithRetry](#promiseWithRetry)
+- [fibonacciRetryConfigurationOptions = AwsUtils.fibonacciRetryConfigurationOptions](#fibonacciRetryConfigurationOptions)
+- [parseArn = AwsUtils.parseArn](#parseArn)
+- [dynamodbLocalClientOptions = AwsUtils.dynamodbLocalClientOptions](#dynamodbLocalClientOptions)
+
+### Exports
+
+### Classes
+
+- [AwsUtils](#classesawsutilsmd)
 
 ### Variables
 
@@ -74,31 +69,13 @@ ___
 #### FIBONACCI\_SEQUENCE\_BACKOFFS
 
 • `Const` **FIBONACCI\_SEQUENCE\_BACKOFFS**: `number`[]
+
 ## Classes
 
 
 <a name="classesawsutilsmd"></a>
 
-[@handy-common-utils/aws-utils](#readmemd) / AwsUtils
-
 ### Class: AwsUtils
-
-#### Table of contents
-
-##### Constructors
-
-- [constructor](#constructor)
-
-##### Methods
-
-- [dynamodbLocalClientOptions](#dynamodblocalclientoptions)
-- [fibonacciRetryConfigurationOptions](#fibonacciretryconfigurationoptions)
-- [parseArn](#parsearn)
-- [promiseWithRetry](#promisewithretry)
-- [repeatFetchingItemsByMarker](#repeatfetchingitemsbymarker)
-- [repeatFetchingItemsByNextToken](#repeatfetchingitemsbynexttoken)
-- [repeatFetchingItemsByPosition](#repeatfetchingitemsbyposition)
-- [withRetry](#withretry)
 
 #### Constructors
 
@@ -139,6 +116,152 @@ the options object
 | `endpoint` | `string` |
 | `region` | `string` |
 | `secretAccessKey` | `string` |
+
+___
+
+##### fetchAllByExclusiveStartKey
+
+▸ `Static` **fetchAllByExclusiveStartKey**<`T`\>(`fetchItemsByExclusiveStartKey`, `itemsFieldName?`): `Promise`<`T`[]\>
+
+Fetch all items through repeatedly calling API with ExclusiveStartKey/LastEvaluatedKey based pagination.
+This function is useful for client side pagination when the response from AWS API contains LastEvaluatedKey and items fields.
+
+**`example`**
+```javascript
+
+const allItemsInDynamoDbTable = await AwsUtils.fetchAllByExclusiveStartKey<MyTableItem>(
+  pagingParam => dynamoDbDocumentClient.scan({...pagingParam, TableName: 'my-table', limit: 20}).promise(),
+);
+
+```
+###### Type parameters
+
+| Name | Description |
+| :------ | :------ |
+| `T` | type of the items returned by AWS API |
+
+###### Parameters
+
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `fetchItemsByExclusiveStartKey` | `FetchItemsFunction`<{ `ExclusiveStartKey?`: `string`  }, { `LastEvaluatedKey?`: `string`  }\> | `undefined` | the function for fetching one batch/page of items by ExclusiveStartKey |
+| `itemsFieldName` | `string` | `'Items'` | name of the field containing returned items in AWS API response, the default value is 'Items' |
+
+###### Returns
+
+`Promise`<`T`[]\>
+
+all items fetched
+
+___
+
+##### fetchAllByMarker
+
+▸ `Static` **fetchAllByMarker**<`T`\>(`fetchItemsByMarker`, `itemsFieldName`): `Promise`<`T`[]\>
+
+Fetch all items through repeatedly calling API with Marker/NextMarker based pagination.
+This function is useful for client side pagination when the response from AWS API contains NextMarker and items fields.
+
+**`example`**
+```javascript
+
+const functionConfigurations = await AwsUtils.fetchAllByMarker<Lambda.FunctionConfiguration>(
+  pagingParam => withRetry(() => lambda.listFunctions({ ...pagingParam }).promise()),
+  'Functions',
+);
+
+```
+###### Type parameters
+
+| Name | Description |
+| :------ | :------ |
+| `T` | type of the items returned by AWS API |
+
+###### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `fetchItemsByMarker` | `FetchItemsFunction`<{ `Marker?`: `string`  }, { `NextMarker?`: `string`  }\> | the function for fetching one batch/page of items by Marker |
+| `itemsFieldName` | `string` | name of the field containing returned items in AWS API response |
+
+###### Returns
+
+`Promise`<`T`[]\>
+
+all items fetched
+
+___
+
+##### fetchAllByNextToken
+
+▸ `Static` **fetchAllByNextToken**<`T`\>(`fetchItemsByNextToken`, `itemsFieldName`): `Promise`<`T`[]\>
+
+Fetch all items through repeatedly calling API with NextToken based pagination.
+This function is useful for client side pagination when the response from AWS API contains NextToken and items fields.
+
+**`example`**
+```javascript
+
+const topics = await AwsUtils.fetchAllByNextToken<SNS.Topic>(
+  pagingParam => sns.listTopics({...pagingParam}).promise(),
+  'Topics',
+);
+
+```
+###### Type parameters
+
+| Name | Description |
+| :------ | :------ |
+| `T` | type of the items returned by AWS API |
+
+###### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `fetchItemsByNextToken` | `FetchItemsFunction`<{ `NextToken?`: `string`  }, { `NextToken?`: `string`  }\> | the function for fetching one batch/page of items by NextToken |
+| `itemsFieldName` | `string` | name of the field containing returned items in AWS API response |
+
+###### Returns
+
+`Promise`<`T`[]\>
+
+all items fetched
+
+___
+
+##### fetchAllByPosition
+
+▸ `Static` **fetchAllByPosition**<`T`\>(`fetchItemsByPosition`, `itemsFieldName?`): `Promise`<`T`[]\>
+
+Fetch all items through repeatedly calling API with position based pagination.
+This function is useful for client side pagination when the response from AWS API contains position and items fields.
+
+**`example`**
+```javascript
+
+const domainNameObjects = await AwsUtils.fetchingAllByPosition(
+  pagingParam => apig.getDomainNames({limit: 500, ...pagingParam}).promise(),
+);
+
+```
+###### Type parameters
+
+| Name | Description |
+| :------ | :------ |
+| `T` | type of the items returned by AWS API |
+
+###### Parameters
+
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `fetchItemsByPosition` | `FetchItemsFunction`<{ `position?`: `string`  }, { `position?`: `string`  }\> | `undefined` | the function for fetching one batch/page of items by position |
+| `itemsFieldName` | `string` | `'items'` | name of the field containing returned items in AWS API response, default value is 'items' |
+
+###### Returns
+
+`Promise`<`T`[]\>
+
+all items fetched
 
 ___
 
@@ -202,7 +325,7 @@ If you don't want `retryable` property to be checked, use `PromiseUtils.withRetr
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `operation` | (`attempt`: `number`, `previousResult`: `undefined` \| `Result`, `previousError`: `undefined` \| `TError`) => { `promise`: () => `Promise`<`Result`\>  } | the AWS operation that returns a Request, such like `() => apig.getBasePathMappings({ domainName, limit: 500 })` |
+| `operation` | (`attempt`: `number`, `previousResult`: `undefined` \| `Result`, `previousError`: `undefined` \| `TError`) => `WithPromiseFunction`<`Result`\> | the AWS operation that returns a Request, such like `() => apig.getBasePathMappings({ domainName, limit: 500 })` |
 | `backoff?` | `number`[] \| (`attempt`: `number`, `previousResult`: `undefined` \| `Result`, `previousError`: `undefined` \| `TError`) => `undefined` \| `number` | Array of retry backoff periods (unit: milliseconds) or function for calculating them.                If retry is desired, before making next call to the operation the desired backoff period would be waited.                If the array runs out of elements or the function returns `undefined`, there would be no further call to the operation.                The `attempt` argument passed into backoff function starts from 2 because only retries need to backoff,                so the first retry is the second attempt.                If ommitted or undefined, a default backoff array will be used.                In case AWS has `retryDelay` property in the returned error, the larger one between `retryDelay` and the backoff will be used. |
 | `statusCodes?` | ``null`` \| (`undefined` \| `number`)[] | Array of status codes for which retry should be done.                    If ommitted or undefined, only 429 status code would result in a retry.                    If it is null, status code would not be looked into.                    If it is an empty array, retry would never happen. |
 
@@ -214,120 +337,17 @@ result coming out from the last attempt
 
 ___
 
-##### repeatFetchingItemsByMarker
-
-▸ `Static` **repeatFetchingItemsByMarker**<`T`\>(`itemsFieldName`, `fetchItemsByMarker`): `Promise`<`T`[]\>
-
-Fetch items by Marker repeatedly.
-This function is useful for client side pagination when the response from AWS API contains NextMarker fields.
-
-**`example`**
-```javascript
-
-const topics = await AwsUtils.repeatFetchingItemsByNextToken<SNS.Topic>('Topics',
-  pagingParam => sns.listTopics({...pagingParam}).promise(),
-);
-
-```
-###### Type parameters
-
-| Name | Description |
-| :------ | :------ |
-| `T` | type of the items returned by AWS API |
-
-###### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `itemsFieldName` | `string` | name of the field containing returned items in AWS API response |
-| `fetchItemsByMarker` | (`parameter`: { `Marker?`: `string`  }) => `Promise`<`Object`\> | the function for fetching items by Marker |
-
-###### Returns
-
-`Promise`<`T`[]\>
-
-all items fetched
-
-___
-
-##### repeatFetchingItemsByNextToken
-
-▸ `Static` **repeatFetchingItemsByNextToken**<`T`\>(`itemsFieldName`, `fetchItemsByNextToken`): `Promise`<`T`[]\>
-
-Fetch items by NextToken repeatedly.
-This function is useful for client side pagination when the response from AWS API contains NextToken fields.
-
-**`example`**
-```javascript
-
-const topics = await AwsUtils.repeatFetchingItemsByNextToken<SNS.Topic>('Topics',
-  pagingParam => sns.listTopics({...pagingParam}).promise(),
-);
-
-```
-###### Type parameters
-
-| Name | Description |
-| :------ | :------ |
-| `T` | type of the items returned by AWS API |
-
-###### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `itemsFieldName` | `string` | name of the field containing returned items in AWS API response |
-| `fetchItemsByNextToken` | (`parameter`: { `NextToken?`: `string`  }) => `Promise`<`Object`\> | the function for fetching items by NextToken |
-
-###### Returns
-
-`Promise`<`T`[]\>
-
-all items fetched
-
-___
-
-##### repeatFetchingItemsByPosition
-
-▸ `Static` **repeatFetchingItemsByPosition**<`T`\>(`fetchItemsByPosition`): `Promise`<`T`[]\>
-
-Fetch items by position repeatedly.
-This function is useful for client side pagination when the response from AWS API contains position and items fields.
-
-**`example`**
-```javascript
-
-const domainNameObjects = await AwsUtils.repeatFetchingItemsByPosition(
-  pagingParam => apig.getDomainNames({limit: 500, ...pagingParam}).promise(),
-);
-
-```
-###### Type parameters
-
-| Name | Description |
-| :------ | :------ |
-| `T` | type of the items returned by AWS API |
-
-###### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `fetchItemsByPosition` | (`parameter`: { `position?`: `string`  }) => `Promise`<`Object`\> | the function for fetching items by position |
-
-###### Returns
-
-`Promise`<`T`[]\>
-
-all items fetched
-
-___
-
 ##### withRetry
 
 ▸ `Static` **withRetry**<`Result`, `TError`\>(`operation`, `backoff?`, `statusCodes?`): `Promise`<`Result`\>
 
+Usually you would find `promiseWithRetry(...)` more convenient.
+
 Perform an AWS operation (returning a Promise) with retry.
 The retry could happen only if the error coming from AWS has property `retryable` equals to true.
 If you don't want `retryable` property to be checked, use `PromiseUtils.withRetry(...)` directly.
+
+**`see`** promiseWithRetry
 
 ###### Type parameters
 

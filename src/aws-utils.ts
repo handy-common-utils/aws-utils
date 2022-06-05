@@ -1,3 +1,21 @@
+/**
+ * ## Re-exports
+ *
+ * ### Functions
+ *
+ * - [fetchAllByNextToken = AwsUtils.fetchAllByNextToken](../classes/aws_utils.AwsUtils.md#fetchAllByNextToken)
+ * - [fetchAllByMarker = AwsUtils.fetchAllByMarker](../classes/aws_utils.AwsUtils.md#fetchAllByMarker)
+ * - [fetchAllByExclusiveStartKey = AwsUtils.fetchAllByExclusiveStartKey](../classes/aws_utils.AwsUtils.md#fetchAllByExclusiveStartKey)
+ * - [withRetry = AwsUtils.withRetry](../classes/aws_utils.AwsUtils.md#withRetry)
+ * - [promiseWithRetry = AwsUtils.promiseWithRetry](../classes/aws_utils.AwsUtils.md#promiseWithRetry)
+ * - [fibonacciRetryConfigurationOptions = AwsUtils.fibonacciRetryConfigurationOptions](../classes/aws_utils.AwsUtils.md#fibonacciRetryConfigurationOptions)
+ * - [parseArn = AwsUtils.parseArn](../classes/aws_utils.AwsUtils.md#parseArn)
+ * - [dynamodbLocalClientOptions = AwsUtils.dynamodbLocalClientOptions](../classes/aws_utils.AwsUtils.md#dynamodbLocalClientOptions)
+ *
+ * ## Exports
+ *
+ * @module
+ */
 /* eslint-disable unicorn/prefer-spread */
 import { PromiseUtils } from '@handy-common-utils/promise-utils';
 import { AWSError } from 'aws-sdk';
@@ -172,7 +190,7 @@ export abstract class AwsUtils {
    *                    If ommitted or undefined, only 429 status code would result in a retry.
    *                    If it is null, status code would not be looked into.
    *                    If it is an empty array, retry would never happen.
-   * @returns result coming out from the last attempt
+   * @returns result came out from the last attempt
    */
   static withRetry<Result, TError = any>(
     operation: (attempt: number, previousResult: Result | undefined, previousError: TError | undefined) => Promise<Result>,
@@ -209,7 +227,7 @@ export abstract class AwsUtils {
    *                    If ommitted or undefined, only 429 status code would result in a retry.
    *                    If it is null, status code would not be looked into.
    *                    If it is an empty array, retry would never happen.
-   * @returns result coming out from the last attempt
+   * @returns result came out from the last attempt
    */
   static promiseWithRetry<Result, TError = any>(
     operation: (attempt: number, previousResult: Result | undefined, previousError: TError | undefined) => WithPromiseFunction<Result>,
@@ -252,14 +270,23 @@ export abstract class AwsUtils {
   }
 }
 
+/** @ignore */
 export const fetchAllByPosition = AwsUtils.fetchAllByPosition;
+/** @ignore */
 export const fetchAllByNextToken = AwsUtils.fetchAllByNextToken;
+/** @ignore */
 export const fetchAllByMarker = AwsUtils.fetchAllByMarker;
+/** @ignore */
 export const fetchAllByExclusiveStartKey = AwsUtils.fetchAllByExclusiveStartKey;
 
+/** @ignore */
 export const withRetry = AwsUtils.withRetry;
+/** @ignore */
 export const promiseWithRetry = AwsUtils.promiseWithRetry;
+/** @ignore */
 export const fibonacciRetryConfigurationOptions = AwsUtils.fibonacciRetryConfigurationOptions;
 
+/** @ignore */
 export const parseArn = AwsUtils.parseArn;
+/** @ignore */
 export const dynamodbLocalClientOptions = AwsUtils.dynamodbLocalClientOptions;
