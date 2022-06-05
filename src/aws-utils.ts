@@ -76,8 +76,8 @@ export abstract class AwsUtils {
    * @param itemsFieldName    name of the field containing returned items in AWS API response, default value is 'items'
    * @returns all items fetched
    */
-  static async fetchAllByPosition<T>(
-    fetchItemsByPosition: FetchItemsFunction<{ position?: string }, { position?: string }>,
+  static async fetchAllByPosition<T, P = string>(
+    fetchItemsByPosition: FetchItemsFunction<{ position?: P }, { position?: P }>,
     itemsFieldName = 'items',
   ): Promise<T[]> {
     return PromiseUtils.repeat(
@@ -104,8 +104,8 @@ export abstract class AwsUtils {
    * @param itemsFieldName    name of the field containing returned items in AWS API response
    * @returns all items fetched
    */
-  static async fetchAllByNextToken<T>(
-    fetchItemsByNextToken: FetchItemsFunction<{ NextToken?: string }, { NextToken?: string }>,
+  static async fetchAllByNextToken<T, K = string>(
+    fetchItemsByNextToken: FetchItemsFunction<{ NextToken?: K }, { NextToken?: K }>,
     itemsFieldName: string,
   ): Promise<T[]> {
     return PromiseUtils.repeat(
@@ -131,8 +131,8 @@ export abstract class AwsUtils {
    * @param itemsFieldName    name of the field containing returned items in AWS API response
    * @returns all items fetched
    */
-  static async fetchAllByMarker<T>(
-    fetchItemsByMarker: FetchItemsFunction<{ Marker?: string }, { NextMarker?: string }>,
+  static async fetchAllByMarker<T, M = string>(
+    fetchItemsByMarker: FetchItemsFunction<{ Marker?: M }, { NextMarker?: M }>,
     itemsFieldName: string,
   ): Promise<T[]> {
     return PromiseUtils.repeat(
