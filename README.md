@@ -158,7 +158,7 @@ ___
 
 ##### fetchAllByMarker
 
-▸ `Static` **fetchAllByMarker**<`T`\>(`fetchItemsByMarker`, `itemsFieldName`): `Promise`<`T`[]\>
+▸ `Static` **fetchAllByMarker**<`T`, `M`\>(`fetchItemsByMarker`, `itemsFieldName`): `Promise`<`T`[]\>
 
 Fetch all items through repeatedly calling API with Marker/NextMarker based pagination.
 This function is useful for client side pagination when the response from AWS API contains NextMarker and items fields.
@@ -174,15 +174,16 @@ const functionConfigurations = await AwsUtils.fetchAllByMarker<Lambda.FunctionCo
 ```
 ###### Type parameters
 
-| Name | Description |
-| :------ | :------ |
-| `T` | type of the items returned by AWS API |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `T` | `T` | type of the items returned by AWS API |
+| `M` | `string` | - |
 
 ###### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `fetchItemsByMarker` | `FetchItemsFunction`<{ `Marker?`: `string`  }, { `NextMarker?`: `string`  }\> | the function for fetching one batch/page of items by Marker |
+| `fetchItemsByMarker` | `FetchItemsFunction`<{ `Marker?`: `M`  }, { `NextMarker?`: `M`  }\> | the function for fetching one batch/page of items by Marker |
 | `itemsFieldName` | `string` | name of the field containing returned items in AWS API response |
 
 ###### Returns
@@ -195,7 +196,7 @@ ___
 
 ##### fetchAllByNextToken
 
-▸ `Static` **fetchAllByNextToken**<`T`\>(`fetchItemsByNextToken`, `itemsFieldName`): `Promise`<`T`[]\>
+▸ `Static` **fetchAllByNextToken**<`T`, `K`\>(`fetchItemsByNextToken`, `itemsFieldName`): `Promise`<`T`[]\>
 
 Fetch all items through repeatedly calling API with NextToken based pagination.
 This function is useful for client side pagination when the response from AWS API contains NextToken and items fields.
@@ -211,15 +212,16 @@ const topics = await AwsUtils.fetchAllByNextToken<SNS.Topic>(
 ```
 ###### Type parameters
 
-| Name | Description |
-| :------ | :------ |
-| `T` | type of the items returned by AWS API |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `T` | `T` | type of the items returned by AWS API |
+| `K` | `string` | - |
 
 ###### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `fetchItemsByNextToken` | `FetchItemsFunction`<{ `NextToken?`: `string`  }, { `NextToken?`: `string`  }\> | the function for fetching one batch/page of items by NextToken |
+| `fetchItemsByNextToken` | `FetchItemsFunction`<{ `NextToken?`: `K`  }, { `NextToken?`: `K`  }\> | the function for fetching one batch/page of items by NextToken |
 | `itemsFieldName` | `string` | name of the field containing returned items in AWS API response |
 
 ###### Returns
@@ -232,7 +234,7 @@ ___
 
 ##### fetchAllByPosition
 
-▸ `Static` **fetchAllByPosition**<`T`\>(`fetchItemsByPosition`, `itemsFieldName?`): `Promise`<`T`[]\>
+▸ `Static` **fetchAllByPosition**<`T`, `P`\>(`fetchItemsByPosition`, `itemsFieldName?`): `Promise`<`T`[]\>
 
 Fetch all items through repeatedly calling API with position based pagination.
 This function is useful for client side pagination when the response from AWS API contains position and items fields.
@@ -247,15 +249,16 @@ const domainNameObjects = await AwsUtils.fetchingAllByPosition(
 ```
 ###### Type parameters
 
-| Name | Description |
-| :------ | :------ |
-| `T` | type of the items returned by AWS API |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `T` | `T` | type of the items returned by AWS API |
+| `P` | `string` | - |
 
 ###### Parameters
 
 | Name | Type | Default value | Description |
 | :------ | :------ | :------ | :------ |
-| `fetchItemsByPosition` | `FetchItemsFunction`<{ `position?`: `string`  }, { `position?`: `string`  }\> | `undefined` | the function for fetching one batch/page of items by position |
+| `fetchItemsByPosition` | `FetchItemsFunction`<{ `position?`: `P`  }, { `position?`: `P`  }\> | `undefined` | the function for fetching one batch/page of items by position |
 | `itemsFieldName` | `string` | `'items'` | name of the field containing returned items in AWS API response, default value is 'items' |
 
 ###### Returns
