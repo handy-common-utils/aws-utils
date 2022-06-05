@@ -20,7 +20,7 @@
     "@unbounce/parse-aws-arn": "^1.2.2"
   },
   "devDependencies": {
-    "@handy-common-utils/dev-dependencies": "^1.1.2",
+    "@handy-common-utils/dev-dependencies": "^1.1.3",
     "aws-sdk": "^2.1148.0",
     "es-check": "^6.2.1"
   },
