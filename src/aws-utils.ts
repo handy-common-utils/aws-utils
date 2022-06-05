@@ -121,7 +121,7 @@ export abstract class AwsUtils {
    * @param itemsFieldName    name of the field containing returned items in AWS API response
    * @returns all items fetched
    */
-   static async repeatFetchingItemsByExclusiveStartKey<T>(
+  static async repeatFetchingItemsByExclusiveStartKey<T>(
     fetchItemsByExclusiveStartKey: (parameter: { ExclusiveStartKey?: string }) => Promise<{ LastEvaluatedKey?: string }>,
     itemsFieldName = 'Items',
   ) {
