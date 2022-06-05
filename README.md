@@ -121,7 +121,7 @@ ___
 
 ##### fetchAllByExclusiveStartKey
 
-▸ `Static` **fetchAllByExclusiveStartKey**<`T`\>(`fetchItemsByExclusiveStartKey`, `itemsFieldName?`): `Promise`<`T`[]\>
+▸ `Static` **fetchAllByExclusiveStartKey**<`T`, `K`\>(`fetchItemsByExclusiveStartKey`, `itemsFieldName?`): `Promise`<`T`[]\>
 
 Fetch all items through repeatedly calling API with ExclusiveStartKey/LastEvaluatedKey based pagination.
 This function is useful for client side pagination when the response from AWS API contains LastEvaluatedKey and items fields.
@@ -136,15 +136,16 @@ const allItemsInDynamoDbTable = await AwsUtils.fetchAllByExclusiveStartKey<MyTab
 ```
 ###### Type parameters
 
-| Name | Description |
-| :------ | :------ |
-| `T` | type of the items returned by AWS API |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `T` | `T` | type of the items returned by AWS API |
+| `K` | { `[key: string]`: `any`;  } | - |
 
 ###### Parameters
 
 | Name | Type | Default value | Description |
 | :------ | :------ | :------ | :------ |
-| `fetchItemsByExclusiveStartKey` | `FetchItemsFunction`<{ `ExclusiveStartKey?`: `string`  }, { `LastEvaluatedKey?`: `string`  }\> | `undefined` | the function for fetching one batch/page of items by ExclusiveStartKey |
+| `fetchItemsByExclusiveStartKey` | `FetchItemsFunction`<{ `ExclusiveStartKey?`: `K`  }, { `LastEvaluatedKey?`: `K`  }\> | `undefined` | the function for fetching one batch/page of items by ExclusiveStartKey |
 | `itemsFieldName` | `string` | `'Items'` | name of the field containing returned items in AWS API response, the default value is 'Items' |
 
 ###### Returns
