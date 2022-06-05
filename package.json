@@ -1,6 +1,6 @@
 {
   "name": "@handy-common-utils/aws-utils",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "AWS related utilities",
   "scripts": {
     "pretest": "eslint . --ext .ts",

@@ -333,7 +333,7 @@ If you don't want `retryable` property to be checked, use `PromiseUtils.withRetr
 
 `Promise`<`Result`\>
 
-result coming out from the last attempt
+result came out from the last attempt
 
 ___
 
@@ -368,5 +368,5 @@ If you don't want `retryable` property to be checked, use `PromiseUtils.withRetr
 
 `Promise`<`Result`\>
 
-result coming out from the last attempt
+result came out from the last attempt
 <!-- API end -->
