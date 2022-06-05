@@ -85,10 +85,9 @@ export abstract class AwsUtils {
    * This function is useful for client side pagination when the response from AWS API contains NextMarker fields.
    *
    * @example
-   * const topics = await AwsUtils.repeatFetchingItemsByNextToken<SNS.Topic>('Topics',
-   *   pagingParam => sns.listTopics({...pagingParam}).promise(),
+   * const functionConfigurations = await AwsUtils.repeatFetchingItemsByMarker<Lambda.FunctionConfiguration>('Functions',
+   *   pagingParam => withRetry(() => lambda.listFunctions({ ...pagingParam }).promise()),
    * );
-   *
    * @template T type of the items returned by AWS API
    *
    * @param itemsFieldName    name of the field containing returned items in AWS API response
@@ -102,6 +101,33 @@ export abstract class AwsUtils {
     return PromiseUtils.repeat(
       fetchItemsByMarker,
       response => response.NextMarker ? { Marker: response.NextMarker } : null,
+      (collection, response: any) => response[itemsFieldName] ? collection.concat(response[itemsFieldName] as Array<T>) : collection,
+      [] as Array<T>,
+    );
+  }
+
+  /**
+   * Fetch items by Marker repeatedly.
+   * This function is useful for client side pagination when the response from AWS API contains NextMarker fields.
+   *
+   * @example
+   * const allItemsInDynamoDbTable = await AwsUtils.repeatFetchingItemsByExclusiveStartKey<MyTableItem>(
+   *   pagingParam => dynamoDbDocumentClient.scan({...pagingParam, TableName: 'my-table', limit: 20}).promise(),
+   * );
+   *
+   * @template T type of the items returned by AWS API
+   *
+   * @param fetchItemsByExclusiveStartKey the function for fetching items by Marker
+   * @param itemsFieldName    name of the field containing returned items in AWS API response
+   * @returns all items fetched
+   */
+   static async repeatFetchingItemsByExclusiveStartKey<T>(
+    fetchItemsByExclusiveStartKey: (parameter: { ExclusiveStartKey?: string }) => Promise<{ LastEvaluatedKey?: string }>,
+    itemsFieldName = 'Items',
+  ) {
+    return PromiseUtils.repeat(
+      fetchItemsByExclusiveStartKey,
+      response => response.LastEvaluatedKey ? { ExclusiveStartKey: response.LastEvaluatedKey } : null,
       (collection, response: any) => response[itemsFieldName] ? collection.concat(response[itemsFieldName] as Array<T>) : collection,
       [] as Array<T>,
     );
@@ -209,6 +235,7 @@ export abstract class AwsUtils {
 export const repeatFetchingItemsByPosition = AwsUtils.repeatFetchingItemsByPosition;
 export const repeatFetchingItemsByNextToken = AwsUtils.repeatFetchingItemsByNextToken;
 export const repeatFetchingItemsByMarker = AwsUtils.repeatFetchingItemsByMarker;
+export const repeatFetchingItemsByExclusiveStartKey = AwsUtils.repeatFetchingItemsByExclusiveStartKey;
 export const withRetry = AwsUtils.withRetry;
 export const promiseWithRetry = AwsUtils.promiseWithRetry;
 export const fibonacciRetryConfigurationOptions = AwsUtils.fibonacciRetryConfigurationOptions;
