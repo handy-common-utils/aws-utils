@@ -92,12 +92,6 @@ ___
 Build an object that can be passed into `DynamoDB.DocumentClient(...)` for
 DynamoDB Local (https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html)
 
-**`example`**
-```javascript
-
-const ddbClient = new DynamoDB.DocumentClient(process.env.IS_OFFLINE === 'true' ? AwsUtils.dynamodbLocalClientOptions() : undefined);
-
-```
 ###### Parameters
 
 | Name | Type | Default value | Description |
@@ -117,6 +111,12 @@ the options object
 | `region` | `string` |
 | `secretAccessKey` | `string` |
 
+**`Example`**
+
+```ts
+const ddbClient = new DynamoDB.DocumentClient(process.env.IS_OFFLINE === 'true' ? AwsUtils.dynamodbLocalClientOptions() : undefined);
+```
+
 ___
 
 ##### fetchAllByExclusiveStartKey
@@ -126,14 +126,6 @@ ___
 Fetch all items through repeatedly calling API with ExclusiveStartKey/LastEvaluatedKey based pagination.
 This function is useful for client side pagination when the response from AWS API contains LastEvaluatedKey and items fields.
 
-**`example`**
-```javascript
-
-const allItemsInDynamoDbTable = await AwsUtils.fetchAllByExclusiveStartKey<MyTableItem>(
-  pagingParam => dynamoDbDocumentClient.scan({...pagingParam, TableName: 'my-table', limit: 20}).promise(),
-);
-
-```
 ###### Type parameters
 
 | Name | Type | Description |
@@ -154,6 +146,14 @@ const allItemsInDynamoDbTable = await AwsUtils.fetchAllByExclusiveStartKey<MyTab
 
 all items fetched
 
+**`Example`**
+
+```ts
+const allItemsInDynamoDbTable = await AwsUtils.fetchAllByExclusiveStartKey<MyTableItem>(
+  pagingParam => dynamoDbDocumentClient.scan({...pagingParam, TableName: 'my-table', limit: 20}).promise(),
+);
+```
+
 ___
 
 ##### fetchAllByMarker
@@ -163,15 +163,6 @@ ___
 Fetch all items through repeatedly calling API with Marker/NextMarker based pagination.
 This function is useful for client side pagination when the response from AWS API contains NextMarker and items fields.
 
-**`example`**
-```javascript
-
-const functionConfigurations = await AwsUtils.fetchAllByMarker<Lambda.FunctionConfiguration>(
-  pagingParam => withRetry(() => lambda.listFunctions({ ...pagingParam }).promise()),
-  'Functions',
-);
-
-```
 ###### Type parameters
 
 | Name | Type | Description |
@@ -192,6 +183,15 @@ const functionConfigurations = await AwsUtils.fetchAllByMarker<Lambda.FunctionCo
 
 all items fetched
 
+**`Example`**
+
+```ts
+const functionConfigurations = await AwsUtils.fetchAllByMarker<Lambda.FunctionConfiguration>(
+  pagingParam => withRetry(() => lambda.listFunctions({ ...pagingParam }).promise()),
+  'Functions',
+);
+```
+
 ___
 
 ##### fetchAllByNextToken
@@ -201,15 +201,6 @@ ___
 Fetch all items through repeatedly calling API with NextToken based pagination.
 This function is useful for client side pagination when the response from AWS API contains NextToken and items fields.
 
-**`example`**
-```javascript
-
-const topics = await AwsUtils.fetchAllByNextToken<SNS.Topic>(
-  pagingParam => sns.listTopics({...pagingParam}).promise(),
-  'Topics',
-);
-
-```
 ###### Type parameters
 
 | Name | Type | Description |
@@ -230,6 +221,15 @@ const topics = await AwsUtils.fetchAllByNextToken<SNS.Topic>(
 
 all items fetched
 
+**`Example`**
+
+```ts
+const topics = await AwsUtils.fetchAllByNextToken<SNS.Topic>(
+  pagingParam => sns.listTopics({...pagingParam}).promise(),
+  'Topics',
+);
+```
+
 ___
 
 ##### fetchAllByPosition
@@ -239,14 +239,6 @@ ___
 Fetch all items through repeatedly calling API with position based pagination.
 This function is useful for client side pagination when the response from AWS API contains position and items fields.
 
-**`example`**
-```javascript
-
-const domainNameObjects = await AwsUtils.fetchingAllByPosition(
-  pagingParam => apig.getDomainNames({limit: 500, ...pagingParam}).promise(),
-);
-
-```
 ###### Type parameters
 
 | Name | Type | Description |
@@ -267,11 +259,19 @@ const domainNameObjects = await AwsUtils.fetchingAllByPosition(
 
 all items fetched
 
+**`Example`**
+
+```ts
+const domainNameObjects = await AwsUtils.fetchingAllByPosition(
+  pagingParam => apig.getDomainNames({limit: 500, ...pagingParam}).promise(),
+);
+```
+
 ___
 
 ##### fibonacciRetryConfigurationOptions
 
-▸ `Static` **fibonacciRetryConfigurationOptions**(`maxRetries`, `base?`): `Pick`<`ConfigurationOptions`, ``"maxRetries"`` \| ``"retryDelayOptions"``\>
+▸ `Static` **fibonacciRetryConfigurationOptions**(`maxRetries`, `base?`): `PartialConfigurationOptions`
 
 Generate part of a ConfigurationOptions object having maxRetries as specified and a custom RetryDelayOptions for fibonacci sequence based retry delays.
 
@@ -284,7 +284,7 @@ Generate part of a ConfigurationOptions object having maxRetries as specified an
 
 ###### Returns
 
-`Pick`<`ConfigurationOptions`, ``"maxRetries"`` \| ``"retryDelayOptions"``\>
+`PartialConfigurationOptions`
 
 part of a ConfigurationOptions object that has maxRetries as specified and a customBackoff utilising fibonacci sequence for calculating delays
 
@@ -315,8 +315,8 @@ ___
 ▸ `Static` **promiseWithRetry**<`Result`, `TError`\>(`operation`, `backoff?`, `statusCodes?`): `Promise`<`Result`\>
 
 Perform an AWS operation (returning a Request) with retry.
-The retry could happen only if the error coming from AWS has property `retryable` equals to true.
-If you don't want `retryable` property to be checked, use `PromiseUtils.withRetry(...)` directly.
+The retry could happen only if the error coming from AWS has property `retryable`/`$retryable` equals to true.
+If you don't want `retryable`/`$retryable` property to be checked, use `PromiseUtils.withRetry(...)` directly.
 
 ###### Type parameters
 
@@ -330,8 +330,8 @@ If you don't want `retryable` property to be checked, use `PromiseUtils.withRetr
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `operation` | (`attempt`: `number`, `previousResult`: `undefined` \| `Result`, `previousError`: `undefined` \| `TError`) => `WithPromiseFunction`<`Result`\> | the AWS operation that returns a Request, such like `() => apig.getBasePathMappings({ domainName, limit: 500 })` |
-| `backoff?` | `number`[] \| (`attempt`: `number`, `previousResult`: `undefined` \| `Result`, `previousError`: `undefined` \| `TError`) => `undefined` \| `number` | Array of retry backoff periods (unit: milliseconds) or function for calculating them.                If retry is desired, before making next call to the operation the desired backoff period would be waited.                If the array runs out of elements or the function returns `undefined`, there would be no further call to the operation.                The `attempt` argument passed into backoff function starts from 2 because only retries need to backoff,                so the first retry is the second attempt.                If ommitted or undefined, a default backoff array will be used.                In case AWS has `retryDelay` property in the returned error, the larger one between `retryDelay` and the backoff will be used. |
-| `statusCodes?` | ``null`` \| (`undefined` \| `number`)[] | Array of status codes for which retry should be done.                    If ommitted or undefined, only 429 status code would result in a retry.                    If it is null, status code would not be looked into.                    If it is an empty array, retry would never happen. |
+| `backoff?` | `number`[] \| (`attempt`: `number`, `previousResult`: `undefined` \| `Result`, `previousError`: `undefined` \| `TError`) => `undefined` \| `number` | Array of retry backoff periods (unit: milliseconds) or function for calculating them. If retry is desired, before making next call to the operation the desired backoff period would be waited. If the array runs out of elements or the function returns `undefined`, there would be no further call to the operation. The `attempt` argument passed into backoff function starts from 2 because only retries need to backoff, so the first retry is the second attempt. If ommitted or undefined, a default backoff array will be used. In case AWS has `retryDelay` property in the returned error, the larger one between `retryDelay` and the backoff will be used. |
+| `statusCodes?` | ``null`` \| (`undefined` \| `number`)[] | Array of status codes for which retry should be done. If ommitted or undefined, only 429 status code would result in a retry. If it is null, status code would not be looked into. If it is an empty array, retry would never happen. |
 
 ###### Returns
 
@@ -348,10 +348,8 @@ ___
 Usually you would find `promiseWithRetry(...)` more convenient.
 
 Perform an AWS operation (returning a Promise) with retry.
-The retry could happen only if the error coming from AWS has property `retryable` equals to true.
-If you don't want `retryable` property to be checked, use `PromiseUtils.withRetry(...)` directly.
-
-**`see`** promiseWithRetry
+The retry could happen only if the error coming from AWS has property `retryable`/`$retryable` equals to true.
+If you don't want `retryable`/`$retryable` property to be checked, use `PromiseUtils.withRetry(...)` directly.
 
 ###### Type parameters
 
@@ -365,12 +363,16 @@ If you don't want `retryable` property to be checked, use `PromiseUtils.withRetr
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `operation` | (`attempt`: `number`, `previousResult`: `undefined` \| `Result`, `previousError`: `undefined` \| `TError`) => `Promise`<`Result`\> | the AWS operation that returns a Promise, such like `() => apig.getBasePathMappings({ domainName, limit: 500 }).promise()` |
-| `backoff` | `number`[] \| (`attempt`: `number`, `previousResult`: `undefined` \| `Result`, `previousError`: `undefined` \| `TError`) => `undefined` \| `number` | Array of retry backoff periods (unit: milliseconds) or function for calculating them.                If retry is desired, before making next call to the operation the desired backoff period would be waited.                If the array runs out of elements or the function returns `undefined` or either the array or the function returns a negative number,                there would be no further call to the operation.                The `attempt` argument passed into backoff function starts from 2 because only retries need to backoff,                so the first retry is the second attempt.                If ommitted or undefined, a default backoff array will be used.                In case AWS has `retryDelay` property in the returned error, the larger one between `retryDelay` and the backoff will be used. |
-| `statusCodes` | ``null`` \| (`undefined` \| `number`)[] | Array of status codes for which retry should be done.                    If ommitted or undefined, only 429 status code would result in a retry.                    If it is null, status code would not be looked into.                    If it is an empty array, retry would never happen. |
+| `backoff` | `number`[] \| (`attempt`: `number`, `previousResult`: `undefined` \| `Result`, `previousError`: `undefined` \| `TError`) => `undefined` \| `number` | Array of retry backoff periods (unit: milliseconds) or function for calculating them. If retry is desired, before making next call to the operation the desired backoff period would be waited. If the array runs out of elements or the function returns `undefined` or either the array or the function returns a negative number, there would be no further call to the operation. The `attempt` argument passed into backoff function starts from 2 because only retries need to backoff, so the first retry is the second attempt. If ommitted or undefined, a default backoff array will be used. In case AWS has `retryDelay` property in the returned error, the larger one between `retryDelay` and the backoff will be used. |
+| `statusCodes` | ``null`` \| (`undefined` \| `number`)[] | Array of status codes for which retry should be done. If ommitted or undefined, only 429 status code would result in a retry. If it is null, status code would not be looked into. If it is an empty array, retry would never happen. |
 
 ###### Returns
 
 `Promise`<`Result`\>
 
 result came out from the last attempt
+
+**`See`**
+
+promiseWithRetry
 <!-- API end -->
