@@ -18,10 +18,33 @@
  */
 /* eslint-disable unicorn/prefer-spread */
 import { PromiseUtils } from '@handy-common-utils/promise-utils';
-import { AWSError } from 'aws-sdk';
 import { parseArn as simpleParseArn } from '@unbounce/parse-aws-arn';
-// eslint-disable-next-line node/no-missing-import
-import { ConfigurationOptions } from 'aws-sdk/lib/config-base';
+
+type AWSError = {
+  statusCode?: number;  // v2
+  retryable?: boolean;  // v2
+  retryDelay?: number;  // v2
+  $retryable?: {        // v3
+    throttling: boolean;
+  };
+  $metadata?: {         // v3
+    httpStatusCode: number;
+  }
+}
+
+type PartialConfigurationOptions = {
+  /**
+   * The maximum amount of retries to perform for a service request.
+   */
+  maxRetries: number;
+  retryDelayOptions: {
+    /**
+     * A custom function that accepts a retry count and error and returns the amount of time to delay in milliseconds. If the result is a non-zero negative value, no further retry attempts will be made.
+     * The base option will be ignored if this option is supplied.
+     */
+    customBackoff: (retryCount: number, err?: Error) => number;
+  }
+}
 
 export const FIBONACCI_SEQUENCE = [1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946, 17711, 28657, 46368, 75025, 121393, 196418, 317811];
 export const FIBONACCI_SEQUENCE_BACKOFFS = [...FIBONACCI_SEQUENCE, -1];
@@ -174,8 +197,8 @@ export abstract class AwsUtils {
    * Usually you would find `promiseWithRetry(...)` more convenient.
    *
    * Perform an AWS operation (returning a Promise) with retry.
-   * The retry could happen only if the error coming from AWS has property `retryable` equals to true.
-   * If you don't want `retryable` property to be checked, use `PromiseUtils.withRetry(...)` directly.
+   * The retry could happen only if the error coming from AWS has property `retryable`/`$retryable` equals to true.
+   * If you don't want `retryable`/`$retryable` property to be checked, use `PromiseUtils.withRetry(...)` directly.
    * @see promiseWithRetry
    * @param operation the AWS operation that returns a Promise, such like `() => apig.getBasePathMappings({ domainName, limit: 500 }).promise()`
    * @param backoff Array of retry backoff periods (unit: milliseconds) or function for calculating them.
@@ -207,14 +230,16 @@ export abstract class AwsUtils {
       return awsRetryDelayMs > backoffMs ? awsRetryDelayMs : backoffMs;
     }, (previousError: TError | undefined) => {
       const awsError = previousError as unknown as AWSError;
-      return awsError?.retryable === true && (statusCodes == null || statusCodes.includes(awsError?.statusCode));
+      const isRetryable = awsError?.retryable ?? awsError?.$retryable?.throttling;
+      const statusCode = awsError?.statusCode ?? awsError?.$metadata?.httpStatusCode;
+      return isRetryable === true && (statusCodes == null || statusCodes.includes(statusCode));
     });
   }
 
   /**
    * Perform an AWS operation (returning a Request) with retry.
-   * The retry could happen only if the error coming from AWS has property `retryable` equals to true.
-   * If you don't want `retryable` property to be checked, use `PromiseUtils.withRetry(...)` directly.
+   * The retry could happen only if the error coming from AWS has property `retryable`/`$retryable` equals to true.
+   * If you don't want `retryable`/`$retryable` property to be checked, use `PromiseUtils.withRetry(...)` directly.
    * @param operation the AWS operation that returns a Request, such like `() => apig.getBasePathMappings({ domainName, limit: 500 })`
    * @param backoff Array of retry backoff periods (unit: milliseconds) or function for calculating them.
    *                If retry is desired, before making next call to the operation the desired backoff period would be waited.
@@ -242,7 +267,7 @@ export abstract class AwsUtils {
    * @param base  The base number of milliseconds to use in the fibonacci backoff for operation retries. Defaults to 100 ms.
    * @returns part of a ConfigurationOptions object that has maxRetries as specified and a customBackoff utilising fibonacci sequence for calculating delays
    */
-  static fibonacciRetryConfigurationOptions(maxRetries: number, base = 100): Pick<ConfigurationOptions, 'maxRetries' | 'retryDelayOptions'> {
+  static fibonacciRetryConfigurationOptions(maxRetries: number, base = 100): PartialConfigurationOptions {
     if (maxRetries < 0 || maxRetries > FIBONACCI_SEQUENCE_BACKOFFS.length - 1) {
       throw new Error(`maxRetries must between 0 and ${FIBONACCI_SEQUENCE_BACKOFFS.length - 1}`);
     }
