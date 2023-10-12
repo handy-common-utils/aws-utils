@@ -1,6 +1,6 @@
 # @handy-common-utils/aws-utils
 
-AWS related utilities
+AWS related utilities that are compatible with both AWS Javascript SDK v3 and v2.
 
 [![Version](https://img.shields.io/npm/v/@handy-common-utils/aws-utils.svg)](https://npmjs.org/package/@handy-common-utils/aws-utils)
 [![Downloads/week](https://img.shields.io/npm/dw/@handy-common-utils/aws-utils.svg)](https://npmjs.org/package/@handy-common-utils/aws-utils)
