@@ -4,6 +4,7 @@
  * ### Functions
  *
  * - [fetchAllByNextToken = AwsUtils.fetchAllByNextToken](../classes/aws_utils.AwsUtils.md#fetchAllByNextToken)
+ * - [fetchAllByNextTokenV3 = AwsUtils.fetchAllByNextTokenV3](../classes/aws_utils.AwsUtils.md#fetchAllByNextTokenV3)
  * - [fetchAllByMarker = AwsUtils.fetchAllByMarker](../classes/aws_utils.AwsUtils.md#fetchAllByMarker)
  * - [fetchAllByExclusiveStartKey = AwsUtils.fetchAllByExclusiveStartKey](../classes/aws_utils.AwsUtils.md#fetchAllByExclusiveStartKey)
  * - [withRetry = AwsUtils.withRetry](../classes/aws_utils.AwsUtils.md#withRetry)
@@ -134,6 +135,39 @@ export abstract class AwsUtils {
     return PromiseUtils.repeat(
       awaitItems(fetchItemsByNextToken),
       response => response.NextToken ? { NextToken: response.NextToken } : null,
+      (collection, response: any) => response[itemsFieldName] ? collection.concat(response[itemsFieldName] as Array<T>) : collection,
+      [] as Array<T>,
+    );
+  }
+
+  /**
+   * Fetch all items through repeatedly calling API with nextToken based pagination which is used in aws-sdk v3.
+   * This function is useful for client side pagination when the response from AWS API contains nextToken and items fields.
+   *
+   * @example
+   * const command = new ListExecutionsCommand({
+   *   stateMachineArn,
+   *   statusFilter: status,
+   * });
+   * 
+   * const executions = AwsUtils.fetchAllByNextToken<ExecutionListItem>(
+   *   (pagingParam) => this.client.send({...command, ...pagingParam}),
+   *   'executions',
+   * );
+   *
+   * @template T type of the items returned by AWS API
+   *
+   * @param fetchItemsByNextToken the function for fetching one batch/page of items by nextToken
+   * @param itemsFieldName    name of the field containing returned items in AWS API response
+   * @returns all items fetched
+   */
+  static async fetchAllByNextTokenV3<T, K = string>(
+    fetchItemsByNextToken: FetchItemsFunction<{ nextToken?: K }, { nextToken?: K }>,
+    itemsFieldName: string,
+  ): Promise<T[]> {
+    return PromiseUtils.repeat(
+      awaitItems(fetchItemsByNextToken),
+      response => response.nextToken ? { nextToken: response.nextToken } : null,
       (collection, response: any) => response[itemsFieldName] ? collection.concat(response[itemsFieldName] as Array<T>) : collection,
       [] as Array<T>,
     );
@@ -299,6 +333,8 @@ export abstract class AwsUtils {
 export const fetchAllByPosition = AwsUtils.fetchAllByPosition;
 /** @ignore */
 export const fetchAllByNextToken = AwsUtils.fetchAllByNextToken;
+/** @ignore */
+export const fetchAllByNextTokenV3 = AwsUtils.fetchAllByNextTokenV3;
 /** @ignore */
 export const fetchAllByMarker = AwsUtils.fetchAllByMarker;
 /** @ignore */
