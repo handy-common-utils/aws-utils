@@ -26,7 +26,7 @@ import { parseArn as simpleParseArn } from '@unbounce/parse-aws-arn';
  */
 export type PossibleAwsError = {
   message: string;
-  
+
   code?: string;        // v2
   statusCode?: number;  // v2
   retryable?: boolean;  // v2
@@ -153,13 +153,12 @@ export abstract class AwsUtils {
    * This function is useful for client side pagination when the response from AWS API contains nextToken and items fields.
    *
    * @example
-   * const command = new ListExecutionsCommand({
-   *   stateMachineArn,
-   *   statusFilter: status,
-   * });
-   * 
-   * const executions = AwsUtils.fetchAllByNextToken<ExecutionListItem>(
-   *   (pagingParam) => this.client.send({...command, ...pagingParam}),
+   * const executions = AwsUtils.fetchAllByNextTokenV3<ExecutionListItem>(
+   *   (pagingParam) => this.client.send(new ListExecutionsCommand({
+   *     stateMachineArn,
+   *     statusFilter: status,
+   *     ...pagingParam,
+   *   })),
    *   'executions',
    * );
    *
