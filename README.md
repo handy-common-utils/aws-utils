@@ -198,8 +198,8 @@ ___
 
 ▸ `Static` **fetchAllByNextToken**<`T`, `K`\>(`fetchItemsByNextToken`, `itemsFieldName`): `Promise`<`T`[]\>
 
-Fetch all items through repeatedly calling API with NextToken based pagination.
-This function is useful for client side pagination when the response from AWS API contains NextToken and items fields.
+Fetch all items through repeatedly calling API with "NextToken" or "nextToken" based pagination.
+This function is useful for client side pagination when the response from AWS API contains "NextToken"/"nextToken" and items fields.
 
 ###### Type parameters
 
@@ -212,7 +212,7 @@ This function is useful for client side pagination when the response from AWS AP
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `fetchItemsByNextToken` | `FetchItemsFunction`<{ `NextToken?`: `K`  }, { `NextToken?`: `K`  }\> | the function for fetching one batch/page of items by NextToken |
+| `fetchItemsByNextToken` | `FetchItemsFunction`<{ `NextToken?`: `K`  }, { `NextToken?`: `K`  }\> \| `FetchItemsFunction`<{ `nextToken?`: `K`  }, { `nextToken?`: `K`  }\> | the function for fetching one batch/page of items by "NextToken"/"nextToken" |
 | `itemsFieldName` | `string` | name of the field containing returned items in AWS API response |
 
 ###### Returns
@@ -227,6 +227,15 @@ all items fetched
 const topics = await AwsUtils.fetchAllByNextToken<SNS.Topic>(
   pagingParam => sns.listTopics({...pagingParam}).promise(),
   'Topics',
+);
+
+const command = new ListExecutionsCommand({
+  stateMachineArn,
+  statusFilter: status,
+});
+const executions = await AwsUtils.fetchAllByNextToken<ExecutionListItem>(
+  (pagingParam) => this.sfnClient.send({...command, ...pagingParam}),
+  'executions',
 );
 ```
 
