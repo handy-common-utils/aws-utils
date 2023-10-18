@@ -153,7 +153,7 @@ export abstract class AwsUtils {
    * This function is useful for client side pagination when the response from AWS API contains nextToken and items fields.
    *
    * @example
-   * const executions = AwsUtils.fetchAllByNextTokenV3<ExecutionListItem>(
+   * const executions = await AwsUtils.fetchAllByNextTokenV3<ExecutionListItem>(
    *   (pagingParam) => this.client.send(new ListExecutionsCommand({
    *     stateMachineArn,
    *     statusFilter: status,
