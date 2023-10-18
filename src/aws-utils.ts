@@ -207,10 +207,10 @@ export abstract class AwsUtils {
    *                there would be no further call to the operation.
    *                The `attempt` argument passed into backoff function starts from 2 because only retries need to backoff,
    *                so the first retry is the second attempt.
-   *                If ommitted or undefined, a default backoff array will be used.
+   *                If omitted or undefined, a default backoff array will be used.
    *                In case AWS has `retryDelay` property in the returned error, the larger one between `retryDelay` and the backoff will be used.
    * @param statusCodes Array of status codes for which retry should be done.
-   *                    If ommitted or undefined, only 429 status code would result in a retry.
+   *                    If omitted or undefined, only 429 status code would result in a retry.
    *                    If it is null, status code would not be looked into.
    *                    If it is an empty array, retry would never happen.
    * @returns result came out from the last attempt
@@ -246,10 +246,10 @@ export abstract class AwsUtils {
    *                If the array runs out of elements or the function returns `undefined`, there would be no further call to the operation.
    *                The `attempt` argument passed into backoff function starts from 2 because only retries need to backoff,
    *                so the first retry is the second attempt.
-   *                If ommitted or undefined, a default backoff array will be used.
+   *                If omitted or undefined, a default backoff array will be used.
    *                In case AWS has `retryDelay` property in the returned error, the larger one between `retryDelay` and the backoff will be used.
    * @param statusCodes Array of status codes for which retry should be done.
-   *                    If ommitted or undefined, only 429 status code would result in a retry.
+   *                    If omitted or undefined, only 429 status code would result in a retry.
    *                    If it is null, status code would not be looked into.
    *                    If it is an empty array, retry would never happen.
    * @returns result came out from the last attempt
@@ -282,7 +282,7 @@ export abstract class AwsUtils {
   /**
    * Parse ARN
    * @param arn the ARN string that could be null or undefined
-   * @returns null or undeinfed if the input is null or undefined, or parsed ARN including the original ARN string
+   * @returns null or undefined if the input is null or undefined, or parsed ARN including the original ARN string
    */
   static parseArn(arn: string | null | undefined): ReturnType<typeof simpleParseArn> & { arn: string } | null | undefined {
     if (arn === null) {
