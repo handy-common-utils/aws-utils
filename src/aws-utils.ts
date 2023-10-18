@@ -112,28 +112,37 @@ export abstract class AwsUtils {
   }
 
   /**
-   * Fetch all items through repeatedly calling API with NextToken based pagination.
-   * This function is useful for client side pagination when the response from AWS API contains NextToken and items fields.
+   * Fetch all items through repeatedly calling API with "NextToken" or "nextToken" based pagination.
+   * This function is useful for client side pagination when the response from AWS API contains "NextToken"/"nextToken" and items fields.
    *
    * @example
    * const topics = await AwsUtils.fetchAllByNextToken<SNS.Topic>(
    *   pagingParam => sns.listTopics({...pagingParam}).promise(),
    *   'Topics',
    * );
+   * 
+   * const command = new ListExecutionsCommand({
+   *   stateMachineArn,
+   *   statusFilter: status,
+   * });
+   * const executions = await AwsUtils.fetchAllByNextToken<ExecutionListItem>(
+   *   (pagingParam) => this.sfnClient.send({...command, ...pagingParam}),
+   *   'executions',
+   * );
    *
    * @template T type of the items returned by AWS API
    *
-   * @param fetchItemsByNextToken the function for fetching one batch/page of items by NextToken
+   * @param fetchItemsByNextToken the function for fetching one batch/page of items by "NextToken"/"nextToken"
    * @param itemsFieldName    name of the field containing returned items in AWS API response
    * @returns all items fetched
    */
   static async fetchAllByNextToken<T, K = string>(
-    fetchItemsByNextToken: FetchItemsFunction<{ NextToken?: K }, { NextToken?: K }>,
+    fetchItemsByNextToken: FetchItemsFunction<{ NextToken?: K }, { NextToken?: K }> | FetchItemsFunction<{ nextToken?: K }, { nextToken?: K }>,
     itemsFieldName: string,
   ): Promise<T[]> {
     return PromiseUtils.repeat(
-      awaitItems(fetchItemsByNextToken),
-      response => response.NextToken ? { NextToken: response.NextToken } : null,
+      awaitItems(fetchItemsByNextToken as FetchItemsFunction<any, { NextToken?: K; nextToken?: K }>),
+      response => response.NextToken ? { NextToken: response.NextToken } : (response.nextToken ? { nextToken: response.nextToken } : null) as { NextToken?: K; nextToken?: K } | null,
       (collection, response: any) => response[itemsFieldName] ? collection.concat(response[itemsFieldName] as Array<T>) : collection,
       [] as Array<T>,
     );
