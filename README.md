@@ -286,13 +286,12 @@ all items fetched
 **`Example`**
 
 ```ts
-const command = new ListExecutionsCommand({
-  stateMachineArn,
-  statusFilter: status,
-});
-
-const executions = AwsUtils.fetchAllByNextToken<ExecutionListItem>(
-  (pagingParam) => this.client.send({...command, ...pagingParam}),
+const executions = AwsUtils.fetchAllByNextTokenV3<ExecutionListItem>(
+  (pagingParam) => this.client.send(new ListExecutionsCommand({
+    stateMachineArn,
+    statusFilter: status,
+    ...pagingParam,
+  })),
   'executions',
 );
 ```
