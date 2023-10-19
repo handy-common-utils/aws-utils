@@ -45,6 +45,7 @@ import { repeatFetchingItemsByNextToken, repeatFetchingItemsByMarker, parseArn }
 
 - [fetchAllByNextToken = AwsUtils.fetchAllByNextToken](#fetchAllByNextToken)
 - [fetchAllByNextTokenV3 = AwsUtils.fetchAllByNextTokenV3](#fetchAllByNextTokenV3)
+- [fetchAllWithPagination = AwsUtils.fetchAllWithPagination](#fetchAllWithPagination)
 - [fetchAllByMarker = AwsUtils.fetchAllByMarker](#fetchAllByMarker)
 - [fetchAllByExclusiveStartKey = AwsUtils.fetchAllByExclusiveStartKey](#fetchAllByExclusiveStartKey)
 - [withRetry = AwsUtils.withRetry](#withRetry)
@@ -286,7 +287,7 @@ all items fetched
 **`Example`**
 
 ```ts
-const executions = AwsUtils.fetchAllByNextTokenV3<ExecutionListItem>(
+const executions = await AwsUtils.fetchAllByNextTokenV3<ExecutionListItem>(
   (pagingParam) => this.client.send(new ListExecutionsCommand({
     stateMachineArn,
     statusFilter: status,
@@ -330,6 +331,54 @@ all items fetched
 ```ts
 const domainNameObjects = await AwsUtils.fetchingAllByPosition(
   pagingParam => apig.getDomainNames({limit: 500, ...pagingParam}).promise(),
+);
+```
+
+___
+
+##### fetchAllWithPagination
+
+▸ `Static` **fetchAllWithPagination**<`IT`, `RT`, `IFN`, `PFN`, `PFT`\>(`fetchOnePageOfItems`, `itemsFieldName`, `paginationFieldName`, `shouldFetchNextPage?`): `Promise`<`IT`[]\>
+
+Fetch all items through repeatedly calling pagination based API.
+This function is useful for client side pagination when the calling AWS API.
+
+###### Type parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `IT` | `IT` | type of the items returned by AWS API |
+| `RT` | extends `Record`<`IFN`, `IT`[]\> & `Partial`<`Record`<`PFN`, `PFT`\>\> | type of the response returned by AWS API |
+| `IFN` | extends `string` | name of the field containing returned items in AWS API response |
+| `PFN` | extends `string` | name of the field containing the pagination token in AWS API response, such like "ExclusiveStartKey", "Marker", "NextToken", "nextToken" |
+| `PFT` | `string` | type of the pagination token in AWS API response, usually it is string |
+
+###### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `fetchOnePageOfItems` | `FetchItemsFunction`<`Partial`<`Record`<`PFN`, `PFT`\>\>, `RT`\> | the function for fetching one batch/page of items by nextToken |
+| `itemsFieldName` | `IFN` | name of the field containing returned items in AWS API response |
+| `paginationFieldName` | `PFN` | name of the field containing the pagination token in AWS API response, such like "ExclusiveStartKey", "Marker", "NextToken", "nextToken" |
+| `shouldFetchNextPage?` | (`response`: `RT`) => `boolean` | a function to determine if the fetch should continue, the default value is always true and will continue fetching items until the response does not contain nextToken field. |
+
+###### Returns
+
+`Promise`<`IT`[]\>
+
+all items fetched
+
+**`Example`**
+
+```ts
+const executions = await AwsUtils.fetchAllWithPagination<ExecutionListItem>(
+  (pagingParam) => this.client.send(new ListExecutionsCommand({
+    stateMachineArn,
+    statusFilter: status,
+    ...pagingParam,
+  })),
+  'executions',
+  'nextToken',
 );
 ```
 
