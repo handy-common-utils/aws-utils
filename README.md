@@ -348,9 +348,9 @@ This function is useful for client side pagination when the calling AWS API.
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `IT` | `IT` | type of the items returned by AWS API |
-| `RT` | extends `Record`<`IFN`, `IT`[]\> & `Partial`<`Record`<`PFN`, `PFT`\>\> | type of the response returned by AWS API |
-| `IFN` | extends `string` | name of the field containing returned items in AWS API response |
-| `PFN` | extends `string` | name of the field containing the pagination token in AWS API response, such like "ExclusiveStartKey", "Marker", "NextToken", "nextToken" |
+| `RT` | extends `Record`<`IFN`, `undefined` \| `IT`[]\> & `Partial`<`Record`<`PFN`, `PFT`\>\> | type of the response returned by AWS API |
+| `IFN` | extends `string` = `string` | name of the field containing returned items in AWS API response |
+| `PFN` | extends `string` = `string` | name of the field containing the pagination token in AWS API response, such like "ExclusiveStartKey", "Marker", "NextToken", "nextToken" |
 | `PFT` | `string` | type of the pagination token in AWS API response, usually it is string |
 
 ###### Parameters
