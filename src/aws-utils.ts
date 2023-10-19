@@ -185,7 +185,7 @@ export abstract class AwsUtils {
   ): Promise<IT[]> {
     return PromiseUtils.repeat(
       awaitItems(fetchOnePageOfItems),
-      response => (!shouldFetchNextPage || shouldFetchNextPage(response)) ? (response[paginationFieldName] ? ({ [paginationFieldName]: response[paginationFieldName] }) as Record<PFN, PFT> : null) : null,
+      response => (!shouldFetchNextPage || shouldFetchNextPage(response)) ? (response[paginationFieldName] ? ({ [paginationFieldName]: response[paginationFieldName] }) as unknown as Record<PFN, PFT> : null) : null,
       (collection, response) => response[itemsFieldName] ? collection.concat(response[itemsFieldName]) : collection,
       [] as Array<IT>,
     );
