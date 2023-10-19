@@ -177,18 +177,18 @@ export abstract class AwsUtils {
    *                              and will continue fetching items until the response does not contain nextToken field.
    * @returns all items fetched
    */
-  static async fetchAllWithPagination<IT, RT extends Record<IFN, IT[]|undefined> & Partial<Record<PFN, PFT>>, IFN extends string = string, PFN extends string = string, PFT = string>(
+  static async fetchAllWithPagination<IT, RT extends Record<IFN, IT[]|undefined> & Partial<Record<PFN, PFT>>, IFN extends string, PFN extends string, PFT = string>(
     fetchOnePageOfItems: FetchItemsFunction<Partial<Record<PFN, PFT>>, RT>,
     itemsFieldName: IFN,
     paginationFieldName: PFN,
     shouldFetchNextPage?: (response: RT) => boolean,
-  ): Promise<IT[]> {
+  ): Promise<Exclude<RT[IFN], undefined>> {
     return PromiseUtils.repeat(
       awaitItems(fetchOnePageOfItems),
       response => (!shouldFetchNextPage || shouldFetchNextPage(response)) ? (response[paginationFieldName] ? ({ [paginationFieldName]: response[paginationFieldName] }) as unknown as Record<PFN, PFT> : null) : null,
       (collection, response) => response[itemsFieldName] ? collection.concat(response[itemsFieldName]!) : collection,
       [] as Array<IT>,
-    );
+    ) as Promise<Exclude<RT[IFN], undefined>>;
   }
 
   /**
