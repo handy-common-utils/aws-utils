@@ -338,7 +338,7 @@ ___
 
 ##### fetchAllWithPagination
 
-▸ `Static` **fetchAllWithPagination**<`IT`, `RT`, `IFN`, `PFN`, `PFT`\>(`fetchOnePageOfItems`, `itemsFieldName`, `paginationFieldName`, `shouldFetchNextPage?`): `Promise`<`IT`[]\>
+▸ `Static` **fetchAllWithPagination**<`IT`, `RT`, `IFN`, `PFN`, `PFT`\>(`fetchOnePageOfItems`, `itemsFieldName`, `paginationFieldName`, `shouldFetchNextPage?`): `Promise`<`Exclude`<`RT`[`IFN`], `undefined`\>\>
 
 Fetch all items through repeatedly calling pagination based API.
 This function is useful for client side pagination when the calling AWS API.
@@ -349,8 +349,8 @@ This function is useful for client side pagination when the calling AWS API.
 | :------ | :------ | :------ |
 | `IT` | `IT` | type of the items returned by AWS API |
 | `RT` | extends `Record`<`IFN`, `undefined` \| `IT`[]\> & `Partial`<`Record`<`PFN`, `PFT`\>\> | type of the response returned by AWS API |
-| `IFN` | extends `string` = `string` | name of the field containing returned items in AWS API response |
-| `PFN` | extends `string` = `string` | name of the field containing the pagination token in AWS API response, such like "ExclusiveStartKey", "Marker", "NextToken", "nextToken" |
+| `IFN` | extends `string` | name of the field containing returned items in AWS API response |
+| `PFN` | extends `string` | name of the field containing the pagination token in AWS API response, such like "ExclusiveStartKey", "Marker", "NextToken", "nextToken" |
 | `PFT` | `string` | type of the pagination token in AWS API response, usually it is string |
 
 ###### Parameters
@@ -364,7 +364,7 @@ This function is useful for client side pagination when the calling AWS API.
 
 ###### Returns
 
-`Promise`<`IT`[]\>
+`Promise`<`Exclude`<`RT`[`IFN`], `undefined`\>\>
 
 all items fetched
 
