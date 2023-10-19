@@ -154,7 +154,7 @@ export abstract class AwsUtils {
    * This function is useful for client side pagination when the calling AWS API.
    *
    * @example
-   * const executions = await AwsUtils.fetchAllWithPagination<ExecutionListItem>(
+   * const executions = await AwsUtils.fetchAllWithPagination(
    *   (pagingParam) => this.client.send(new ListExecutionsCommand({
    *     stateMachineArn,
    *     statusFilter: status,
@@ -162,6 +162,7 @@ export abstract class AwsUtils {
    *   })),
    *   'executions',
    *   'nextToken',
+   *   (resp) => resp.executions != null && resp.executions.some((exe) => exe.startDate!.getTime() <= beginTime),
    * );
    *
    * @template IT type of the items returned by AWS API
