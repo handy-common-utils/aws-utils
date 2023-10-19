@@ -5,6 +5,7 @@
  *
  * - [fetchAllByNextToken = AwsUtils.fetchAllByNextToken](../classes/aws_utils.AwsUtils.md#fetchAllByNextToken)
  * - [fetchAllByNextTokenV3 = AwsUtils.fetchAllByNextTokenV3](../classes/aws_utils.AwsUtils.md#fetchAllByNextTokenV3)
+ * - [fetchAllWithPagination = AwsUtils.fetchAllWithPagination](../classes/aws_utils.AwsUtils.md#fetchAllWithPagination)
  * - [fetchAllByMarker = AwsUtils.fetchAllByMarker](../classes/aws_utils.AwsUtils.md#fetchAllByMarker)
  * - [fetchAllByExclusiveStartKey = AwsUtils.fetchAllByExclusiveStartKey](../classes/aws_utils.AwsUtils.md#fetchAllByExclusiveStartKey)
  * - [withRetry = AwsUtils.withRetry](../classes/aws_utils.AwsUtils.md#withRetry)
@@ -145,6 +146,48 @@ export abstract class AwsUtils {
       response => response.NextToken ? { NextToken: response.NextToken } : null,
       (collection, response: any) => response[itemsFieldName] ? collection.concat(response[itemsFieldName] as Array<T>) : collection,
       [] as Array<T>,
+    );
+  }
+
+  /**
+   * Fetch all items through repeatedly calling pagination based API.
+   * This function is useful for client side pagination when the calling AWS API.
+   *
+   * @example
+   * const executions = await AwsUtils.fetchAllWithPagination<ExecutionListItem>(
+   *   (pagingParam) => this.client.send(new ListExecutionsCommand({
+   *     stateMachineArn,
+   *     statusFilter: status,
+   *     ...pagingParam,
+   *   })),
+   *   'executions',
+   *   'nextToken',
+   * );
+   *
+   * @template IT type of the items returned by AWS API
+   * @template RT type of the response returned by AWS API
+   * @template IFN name of the field containing returned items in AWS API response
+   * @template PFN name of the field containing the pagination token in AWS API response, such like "ExclusiveStartKey", "Marker", "NextToken", "nextToken"
+   * @template PFT type of the pagination token in AWS API response, usually it is string
+   *
+   * @param fetchOnePageOfItems   the function for fetching one batch/page of items by nextToken
+   * @param itemsFieldName        name of the field containing returned items in AWS API response
+   * @param paginationFieldName   name of the field containing the pagination token in AWS API response, such like "ExclusiveStartKey", "Marker", "NextToken", "nextToken"
+   * @param shouldFetchNextPage   a function to determine if the fetch should continue, the default value is always true
+   *                              and will continue fetching items until the response does not contain nextToken field.
+   * @returns all items fetched
+   */
+  static async fetchAllWithPagination<IT, RT extends Record<IFN, IT[]> & Partial<Record<PFN, PFT>>, IFN extends string, PFN extends string, PFT = string>(
+    fetchOnePageOfItems: FetchItemsFunction<Partial<Record<PFN, PFT>>, RT>,
+    itemsFieldName: IFN,
+    paginationFieldName: PFN,
+    shouldFetchNextPage?: (response: RT) => boolean,
+  ): Promise<IT[]> {
+    return PromiseUtils.repeat(
+      awaitItems(fetchOnePageOfItems),
+      response => (!shouldFetchNextPage || shouldFetchNextPage(response)) ? (response[paginationFieldName] ? ({ [paginationFieldName]: response[paginationFieldName] }) as Record<PFN, PFT> : null) : null,
+      (collection, response) => response[itemsFieldName] ? collection.concat(response[itemsFieldName]) : collection,
+      [] as Array<IT>,
     );
   }
 
@@ -342,6 +385,8 @@ export const fetchAllByPosition = AwsUtils.fetchAllByPosition;
 export const fetchAllByNextToken = AwsUtils.fetchAllByNextToken;
 /** @ignore */
 export const fetchAllByNextTokenV3 = AwsUtils.fetchAllByNextTokenV3;
+/** @ignore */
+export const fetchAllWithPagination = AwsUtils.fetchAllWithPagination;
 /** @ignore */
 export const fetchAllByMarker = AwsUtils.fetchAllByMarker;
 /** @ignore */
