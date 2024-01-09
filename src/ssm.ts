@@ -1,4 +1,5 @@
 import { SSM } from '@aws-sdk/client-ssm';
+
 import { PossibleAwsError } from './aws-utils';
 
 /**
