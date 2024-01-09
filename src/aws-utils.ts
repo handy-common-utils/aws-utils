@@ -19,7 +19,7 @@
  * @module
  */
 /* eslint-disable unicorn/prefer-spread */
-import { PromiseUtils } from '@handy-common-utils/promise-utils';
+import { FIBONACCI_SEQUENCE, PromiseUtils } from '@handy-common-utils/promise-utils';
 import { parseArn as simpleParseArn } from '@unbounce/parse-aws-arn';
 
 /**
@@ -28,16 +28,37 @@ import { parseArn as simpleParseArn } from '@unbounce/parse-aws-arn';
 export type PossibleAwsError = {
   message: string;
 
-  code?: string;        // v2
-  statusCode?: number;  // v2
-  retryable?: boolean;  // v2
-  retryDelay?: number;  // v2
+  /**
+   * v2 code
+   */
+  code?: string;
+  /**
+   * v2 statusCode
+   */
+  statusCode?: number;
+  /**
+   * v2 retryable
+   */
+  retryable?: boolean;
+  /**
+   * v2 retryDelay
+   */
+  retryDelay?: number;
 
-  name?: string;        // v3
-  $retryable?: {        // v3
+  /**
+   * v3 name
+   */
+  name?: string;
+  /**
+   * v3 $retryable
+   */
+  $retryable?: {
     throttling: boolean;
   };
-  $metadata?: {         // v3
+  /**
+   * v3 $metadata
+   */
+  $metadata?: {
     httpStatusCode: number;
   }
 }
@@ -56,7 +77,7 @@ type PartialConfigurationOptions = {
   }
 }
 
-export const FIBONACCI_SEQUENCE = [1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946, 17711, 28657, 46368, 75025, 121393, 196418, 317811];
+export { FIBONACCI_SEQUENCE } from '@handy-common-utils/promise-utils';
 export const FIBONACCI_SEQUENCE_BACKOFFS = [...FIBONACCI_SEQUENCE, -1];
 
 type WithPromiseFunction<O> = { promise: () => Promise<O> };
