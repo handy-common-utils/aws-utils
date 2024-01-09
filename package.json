@@ -22,12 +22,19 @@
     "./s3": {
       "types": "./dist/s3.d.ts",
       "default": "./dist/s3.js"
+    },
+    "./ssm": {
+      "types": "./dist/ssm.d.ts",
+      "default": "./dist/ssm.js"
     }
   },
   "typesVersions": {
     "*": {
       "s3": [
         "./dist/s3.d.ts"
+      ],
+      "ssm": [
+        "./dist/ssm.d.ts"
       ],
       "*": [
         "./dist/aws-utils.d.ts"
@@ -40,7 +47,8 @@
     "@unbounce/parse-aws-arn": "^1.2.2"
   },
   "optionalDependencies": {
-    "@aws-sdk/client-s3": "^3.485.0"
+    "@aws-sdk/client-s3": "^3.485.0",
+    "@aws-sdk/client-ssm": "^3.485.0"
   },
   "bundleDependencies": [
     "@unbounce/parse-aws-arn"
