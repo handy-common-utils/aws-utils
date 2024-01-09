@@ -1,6 +1,6 @@
 # @handy-common-utils/aws-utils
 
-AWS related utilities that are compatible with both AWS Javascript SDK v3 and v2.
+AWS related utilities that are compatible with both AWS Javascript SDK v3 and v2, and also some utilities that require v3.
 
 [![Version](https://img.shields.io/npm/v/@handy-common-utils/aws-utils.svg)](https://npmjs.org/package/@handy-common-utils/aws-utils)
 [![Downloads/week](https://img.shields.io/npm/dw/@handy-common-utils/aws-utils.svg)](https://npmjs.org/package/@handy-common-utils/aws-utils)
@@ -31,6 +31,23 @@ or you can import individual [functions](#variables) directly like below:
 ```javascript
 import { repeatFetchingItemsByNextToken, repeatFetchingItemsByMarker, parseArn } from '@handy-common-utils/aws-utils';
 ```
+
+S3 related utility functions can be imported and used in this way:
+
+```javascript
+import { decodeS3ObjectKey, deleteS3ObjectSilently } from '@handy-common-utils/aws-utils/s3';
+
+const srcEncodedKey = record.s3.object.key;
+const srcKey = decodeS3ObjectKey(srcEncodedKey);
+const destKey = srcKey.replace('/src-dir/', '/dest-dir/')
+
+const s3 = new S3Client();
+await copyS3Object(s3, bucket, srcEncodedKey, destKey);
+await deleteS3ObjectSilently(s3, bucket, srcKey);
+```
+
+To use S3 related utilities, you need to add `@aws-sdk/client-s3` as a dependency of your project
+because it is not included as a dependency of this package.
 
 # API
 
