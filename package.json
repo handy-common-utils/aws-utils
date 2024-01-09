@@ -39,10 +39,14 @@
     "@handy-common-utils/promise-utils": "^1.4.1",
     "@unbounce/parse-aws-arn": "^1.2.2"
   },
+  "optionalDependencies": {
+    "@aws-sdk/client-s3": "^3.485.0"
+  },
+  "bundleDependencies": [
+    "@unbounce/parse-aws-arn"
+  ],
   "devDependencies": {
-    "@aws-sdk/client-s3": "^3.485.0",
-    "@handy-common-utils/dev-dependencies-mocha": "^1.5.4",
-    "aws-sdk": "^2.1532.0"
+    "@handy-common-utils/dev-dependencies-mocha": "^1.5.4"
   },
   "volta": {
     "node": "16.17.1",
