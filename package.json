@@ -17,11 +17,17 @@
   "exports": {
     ".": {
       "types": "./dist/aws-utils.d.ts",
-      "require": "./dist/aws-utils.js"
+      "default": "./dist/aws-utils.js"
     },
     "./s3": {
       "types": "./dist/s3.d.ts",
-      "require": "./dist/s3.js"
+      "default": "./dist/s3.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "s3": ["./dist/s3.d.ts"],
+      "*": ["./dist/aws-utils.d.ts"]
     }
   },
   "bin": {},
