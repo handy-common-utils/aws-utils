@@ -8,6 +8,7 @@
     "**/*.spec.ts"
   ],
   "compilerOptions": {
+    "skipLibCheck": true,
     "lib": ["ES2021"],
     "target": "es2017",
     "outDir": "dist"
