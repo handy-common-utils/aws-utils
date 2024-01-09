@@ -9,6 +9,8 @@ AWS related utilities that are compatible with both AWS Javascript SDK v3 and v2
 
 ## How to use
 
+### Core
+
 First add it as a dependency:
 
 ```sh
@@ -32,9 +34,12 @@ or you can import individual [functions](#variables) directly like below:
 import { repeatFetchingItemsByNextToken, repeatFetchingItemsByMarker, parseArn } from '@handy-common-utils/aws-utils';
 ```
 
+### S3
+
 S3 related utility functions can be imported and used in this way:
 
 ```javascript
+import { S3Client } from '@aws-sdk/client-s3';
 import { decodeS3ObjectKey, deleteS3ObjectSilently } from '@handy-common-utils/aws-utils/s3';
 
 const srcEncodedKey = record.s3.object.key;
@@ -47,6 +52,22 @@ await deleteS3ObjectSilently(s3, bucket, srcKey);
 ```
 
 To use S3 related utilities, you need to add `@aws-sdk/client-s3` as a dependency of your project
+because it is not included as a dependency of this package.
+
+### SSM
+
+SSM related utility functions can be imported and used in this way:
+
+```javascript
+import { SSM } from '@aws-sdk/client-ssm';
+import { getSsmParameter, getSsmParameterParsed } from '@handy-common-utils/aws-utils/ssm';
+
+const ssm = new SSM();
+const workDir = await getSsmParameter(ssm, '/my-config/work-dir', '/tmp');
+const config = await getSsmParameterParsed<Config>(ssm, '/my-config/config');
+```
+
+To use SSM related utilities, you need to add `@aws-sdk/client-ssm` as a dependency of your project
 because it is not included as a dependency of this package.
 
 # API
