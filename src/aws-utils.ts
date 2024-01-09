@@ -300,9 +300,10 @@ export abstract class AwsUtils {
   }
 
   /**
-   * Usually you would find `promiseWithRetry(...)` more convenient.
-   *
    * Perform an AWS operation (returning a Promise) with retry.
+   * This function is quite handy when you are using AWS SDK v3.
+   * If you are using AWS SDK v2, `promiseWithRetry(...)` could be more convenient.
+   * 
    * The retry could happen only if the error coming from AWS has property `retryable`/`$retryable` equals to true.
    * If you don't want `retryable`/`$retryable` property to be checked, use `PromiseUtils.withRetry(...)` directly.
    * @see promiseWithRetry
@@ -344,6 +345,9 @@ export abstract class AwsUtils {
 
   /**
    * Perform an AWS operation (returning a Request) with retry.
+   * This function is quite handy when you are using AWS SDK v2.
+   * If you are using AWS SDK v3, use `withRetry(...)` instead.
+   *
    * The retry could happen only if the error coming from AWS has property `retryable`/`$retryable` equals to true.
    * If you don't want `retryable`/`$retryable` property to be checked, use `PromiseUtils.withRetry(...)` directly.
    * @param operation the AWS operation that returns a Request, such like `() => apig.getBasePathMappings({ domainName, limit: 500 })`
