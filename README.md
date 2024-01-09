@@ -81,6 +81,7 @@ because it is not included as a dependency of this package.
 
 - [aws-utils](#modulesaws_utilsmd)
 - [s3](#moduless3md)
+- [ssm](#modulesssmmd)
 
 ## Classes
 
@@ -719,4 +720,65 @@ Get details of the S3 object without downloading its content
 `Promise`\<`HeadObjectCommandOutput`\>
 
 S3 command output
+
+
+<a name="modulesssmmd"></a>
+
+### Module: ssm
+
+#### Functions
+
+##### getSsmParameter
+
+▸ **getSsmParameter**(`ssm`, `parameterName`, `fallbackValue?`): `Promise`\<`string` \| `undefined`\>
+
+Get a parameter from SSM Parameter Store.
+If the parameter is not found and a fallbackValue is given, the fallbackValue will be returned.
+If the parameter is not found and there is no fallbackValue given, `undefined` will be returned.
+If any other error occurs, the error will be thrown.
+
+###### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `ssm` | `SSM` | SSM |
+| `parameterName` | `string` | Name/path of the parameter to get from SSM Parameter Store. |
+| `fallbackValue?` | `string` | the value to return if the parameter is not found. If not given, `undefined` will be returned when the parameter is not found. |
+
+###### Returns
+
+`Promise`\<`string` \| `undefined`\>
+
+Value of the parameter, or the fallbackValue, or undefined
+
+___
+
+##### getSsmParameterParsed
+
+▸ **getSsmParameterParsed**\<`T`\>(`ssm`, `parameterName`, `fallbackValue?`): `Promise`\<`T` \| `undefined`\>
+
+Get a parameter from SSM Parameter Store and return it parsed as JSON.
+If the parameter is not found and a fallbackValue is given, the fallbackValue will be returned.
+If the parameter is not found and there is no fallbackValue given, `undefined` will be returned.
+If any other error occurs, the error will be thrown.
+
+###### Type parameters
+
+| Name |
+| :------ |
+| `T` |
+
+###### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `ssm` | `SSM` | SSM |
+| `parameterName` | `string` | Name/path of the parameter to get from SSM Parameter Store. |
+| `fallbackValue?` | `T` | the value to return if the parameter is not found. If not given, `undefined` will be returned when the parameter is not found. |
+
+###### Returns
+
+`Promise`\<`T` \| `undefined`\>
+
+Value of the parameter parsed as JSON, or the fallbackValue, or undefined
 <!-- API end -->
