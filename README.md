@@ -40,7 +40,7 @@ S3 related utility functions can be imported and used in this way:
 
 ```javascript
 import { S3Client } from '@aws-sdk/client-s3';
-import { decodeS3ObjectKey, deleteS3ObjectSilently } from '@handy-common-utils/aws-utils/s3';
+import { decodeS3ObjectKey, deleteS3Object } from '@handy-common-utils/aws-utils/s3';
 
 const srcEncodedKey = record.s3.object.key;
 const srcKey = decodeS3ObjectKey(srcEncodedKey);
@@ -48,7 +48,7 @@ const destKey = srcKey.replace('/src-dir/', '/dest-dir/')
 
 const s3 = new S3Client();
 await copyS3Object(s3, bucket, srcEncodedKey, destKey);
-await deleteS3ObjectSilently(s3, bucket, srcKey);
+await deleteS3Object(s3, bucket, srcKey);
 ```
 
 To use S3 related utilities, you need to add `@aws-sdk/client-s3` as a dependency of your project

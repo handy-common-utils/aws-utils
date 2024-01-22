@@ -21,7 +21,7 @@ export function decodeS3ObjectKey(key: string): string {
 }
 
 /**
- * Delete an existing S3 object
+ * Delete an S3 object. No error would be thrown if the object does not exist.
  * @param s3 S3Client
  * @param bucket bucket name
  * @param key object key (without URL encoding)
@@ -34,23 +34,6 @@ export async function deleteS3Object(s3: S3Client, bucket: string, key: string):
       Key: key,
     }),
   );
-}
-
-/**
- * Delete an S3 object, and does not throw an error if the object does not already exist.
- * @param s3 S3Client
- * @param bucket bucket name
- * @param key object key (without URL encoding)
- * @returns void
- */
-export async function deleteS3ObjectSilently(s3: S3Client, bucket: string, key: string): Promise<void> {
-  try {
-    await deleteS3Object(s3, bucket, key);
-  } catch (error: any) {
-    if ((error as PossibleAwsError)?.$metadata?.httpStatusCode !== 404) {
-      throw error;
-    }
-  }
 }
 
 /**
