@@ -421,6 +421,9 @@ ___
 ▸ `Static` **promiseWithRetry**\<`Result`, `TError`\>(`operation`, `backoff?`, `statusCodes?`): `Promise`\<`Result`\>
 
 Perform an AWS operation (returning a Request) with retry.
+This function is quite handy when you are using AWS SDK v2.
+If you are using AWS SDK v3, use `withRetry(...)` instead.
+
 The retry could happen only if the error coming from AWS has property `retryable`/`$retryable` equals to true.
 If you don't want `retryable`/`$retryable` property to be checked, use `PromiseUtils.withRetry(...)` directly.
 
@@ -451,9 +454,10 @@ ___
 
 ▸ `Static` **withRetry**\<`Result`, `TError`\>(`operation`, `backoff?`, `statusCodes?`): `Promise`\<`Result`\>
 
-Usually you would find `promiseWithRetry(...)` more convenient.
-
 Perform an AWS operation (returning a Promise) with retry.
+This function is quite handy when you are using AWS SDK v3.
+If you are using AWS SDK v2, `promiseWithRetry(...)` could be more convenient.
+
 The retry could happen only if the error coming from AWS has property `retryable`/`$retryable` equals to true.
 If you don't want `retryable`/`$retryable` property to be checked, use `PromiseUtils.withRetry(...)` directly.
 
@@ -595,7 +599,7 @@ ___
 
 ▸ **deleteS3Object**(`s3`, `bucket`, `key`): `Promise`\<`DeleteObjectCommandOutput`\>
 
-Delete an existing S3 object
+Delete an S3 object. No error would be thrown if the object does not exist.
 
 ###### Parameters
 
@@ -610,28 +614,6 @@ Delete an existing S3 object
 `Promise`\<`DeleteObjectCommandOutput`\>
 
 S3 command output
-
-___
-
-##### deleteS3ObjectSilently
-
-▸ **deleteS3ObjectSilently**(`s3`, `bucket`, `key`): `Promise`\<`void`\>
-
-Delete an S3 object, and does not throw an error if the object does not already exist.
-
-###### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `s3` | `S3Client` | S3Client |
-| `bucket` | `string` | bucket name |
-| `key` | `string` | object key (without URL encoding) |
-
-###### Returns
-
-`Promise`\<`void`\>
-
-void
 
 ___
 
