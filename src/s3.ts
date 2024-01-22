@@ -1,7 +1,5 @@
 import { CopyObjectCommand, CopyObjectCommandOutput, DeleteObjectCommand, DeleteObjectCommandOutput, GetObjectCommand, HeadObjectCommand, HeadObjectCommandOutput, S3Client } from '@aws-sdk/client-s3';
 
-import { PossibleAwsError } from './aws-utils';
-
 /**
  * URL encode the object key, and also replace "%20" with " " and "%2F with "/" which is the convention of AWS
  * @param key The S3 object key before encoding
