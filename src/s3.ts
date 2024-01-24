@@ -1,4 +1,5 @@
 import { CopyObjectCommand, CopyObjectCommandOutput, DeleteObjectCommand, DeleteObjectCommandOutput, GetObjectCommand, HeadObjectCommand, HeadObjectCommandOutput, ListObjectsV2Command, ListObjectsV2CommandInput, PutObjectCommand, PutObjectCommandInput, PutObjectOutput, S3Client } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 import { fetchAllByContinuationToken } from './aws-utils';
 
@@ -157,3 +158,28 @@ export async function putS3Object(s3: S3Client, bucket: string, key: string, con
   }));
 }
 
+/**
+ * Generate a pre-signed URL for downloading the S3 object
+ * @param s3 S3Client
+ * @param bucket Name of the bucket
+ * @param key Key of the object
+ * @param expiresIn The number of seconds before the presigned URL expires
+ * @returns An URL that can be used to download the S3 object.
+ */
+export async function generatePresignedUrlForDownloading(s3: S3Client, bucket: string, key: string, expiresIn: number): Promise<string> {
+  const command = new GetObjectCommand({ Bucket: bucket, Key: key });
+  return getSignedUrl(s3, command, { expiresIn });
+};
+
+/**
+ * Generate a pre-signed URL for uploading content to the S3 object
+ * @param s3 S3Client
+ * @param bucket Name of the bucket
+ * @param key Key of the object
+ * @param expiresIn The number of seconds before the presigned URL expires
+ * @returns An URL that can be used to upload content to the S3 object.
+ */
+export async function generatePresignedUrlForUploading(s3: S3Client, bucket: string, key: string, expiresIn: number): Promise<string> {
+  const command = new PutObjectCommand({ Bucket: bucket, Key: key });
+  return getSignedUrl(s3, command, { expiresIn });
+};
