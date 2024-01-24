@@ -277,10 +277,8 @@ export abstract class AwsUtils {
    * This function is useful for client side pagination when the response from AWS API contains NextContinuationToken and items fields.
    *
    * @example
-   * const functionConfigurations = await AwsUtils.fetchAllByContinuationToken<Lambda.FunctionConfiguration>(
-   *   pagingParam => withRetry(() => lambda.listFunctions({ ...pagingParam }).promise()),
-   *   'Functions',
-   * );
+   * const objects = await fetchAllByContinuationToken(() => s3.send(new ListObjectsV2Command({Bucket: bucket})));
+   *
    * @template T type of the items returned by AWS API
    *
    * @param fetchItemsByContinuationToken the function for fetching one batch/page of items by ContinuationToken
