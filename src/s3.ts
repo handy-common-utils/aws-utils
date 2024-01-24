@@ -132,7 +132,7 @@ export interface S3ObjectSummary {
  * @param options Optional settings for the scan
  * @returns Array of normal and directory objects found
  */
-export async function scanS3Bucket(s3: S3Client, bucket: string, options?: Partial<Exclude<ListObjectsV2CommandInput, 'Bucket'|'ContinuationToken'>>): Promise<Array<any>> {
+export async function scanS3Bucket(s3: S3Client, bucket: string, options?: Partial<Exclude<ListObjectsV2CommandInput, 'Bucket'|'ContinuationToken'>>): Promise<Array<S3ObjectSummary>> {
   return await fetchAllByContinuationToken(() => s3.send(new ListObjectsV2Command({
     Bucket: bucket,
     ...options,
