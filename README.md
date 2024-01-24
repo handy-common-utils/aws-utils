@@ -164,10 +164,7 @@ all items fetched
 **`Example`**
 
 ```ts
-const functionConfigurations = await AwsUtils.fetchAllByContinuationToken<Lambda.FunctionConfiguration>(
-  pagingParam => withRetry(() => lambda.listFunctions({ ...pagingParam }).promise()),
-  'Functions',
-);
+const objects = await fetchAllByContinuationToken(() => s3.send(new ListObjectsV2Command({Bucket: bucket})));
 ```
 
 ___
@@ -791,7 +788,7 @@ ___
 
 ##### scanS3Bucket
 
-▸ **scanS3Bucket**(`s3`, `bucket`, `options?`): `Promise`\<`any`[]\>
+▸ **scanS3Bucket**(`s3`, `bucket`, `options?`): `Promise`\<[`S3ObjectSummary`](#interfacess3s3objectsummarymd)[]\>
 
 Scan S3 bucket and return both normal objects and directory objects.
 Directory objects have keys ending with '/'.
@@ -807,7 +804,7 @@ This function handles pagination automatically.
 
 ###### Returns
 
-`Promise`\<`any`[]\>
+`Promise`\<[`S3ObjectSummary`](#interfacess3s3objectsummarymd)[]\>
 
 Array of normal and directory objects found
 
