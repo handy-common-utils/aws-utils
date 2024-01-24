@@ -148,7 +148,7 @@ export async function scanS3Bucket(s3: S3Client, bucket: string, options?: Parti
  * @param options Additional options
  * @returns PutObjectOutput
  */
-export async function pubS3Object(s3: S3Client, bucket: string, key: string, content: PutObjectCommandInput['Body'], options?: Partial<Exclude<PutObjectCommandInput, 'Bucket'>>): Promise<PutObjectOutput> {
+export async function putS3Object(s3: S3Client, bucket: string, key: string, content: PutObjectCommandInput['Body'], options?: Partial<Exclude<PutObjectCommandInput, 'Bucket'>>): Promise<PutObjectOutput> {
   return await s3.send(new PutObjectCommand({
     Bucket: bucket,
     Key: key,
@@ -156,3 +156,4 @@ export async function pubS3Object(s3: S3Client, bucket: string, key: string, con
     ...options,
   }));
 }
+
