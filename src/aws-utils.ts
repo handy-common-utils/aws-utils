@@ -273,6 +273,33 @@ export abstract class AwsUtils {
   }
 
   /**
+   * Fetch all items through repeatedly calling API with ContinuationToken/NextContinuationToken based pagination.
+   * This function is useful for client side pagination when the response from AWS API contains NextContinuationToken and items fields.
+   *
+   * @example
+   * const functionConfigurations = await AwsUtils.fetchAllByContinuationToken<Lambda.FunctionConfiguration>(
+   *   pagingParam => withRetry(() => lambda.listFunctions({ ...pagingParam }).promise()),
+   *   'Functions',
+   * );
+   * @template T type of the items returned by AWS API
+   *
+   * @param fetchItemsByContinuationToken the function for fetching one batch/page of items by ContinuationToken
+   * @param itemsFieldName    name of the field containing returned items in AWS API response
+   * @returns all items fetched
+   */
+  static async fetchAllByContinuationToken<T, M = string>(
+    fetchItemsByContinuationToken: FetchItemsFunction<{ ContinuationToken?: M }, { NextContinuationToken?: M }>,
+    itemsFieldName: string = 'Contents',
+  ): Promise<T[]> {
+    return PromiseUtils.repeat(
+      awaitItems(fetchItemsByContinuationToken),
+      response => response.NextContinuationToken ? { ContinuationToken: response.NextContinuationToken } : null,
+      (collection, response: any) => response[itemsFieldName] ? collection.concat(response[itemsFieldName] as Array<T>) : collection,
+      [] as Array<T>,
+    );
+  }
+
+  /**
    * Fetch all items through repeatedly calling API with ExclusiveStartKey/LastEvaluatedKey based pagination.
    * This function is useful for client side pagination when the response from AWS API contains LastEvaluatedKey and items fields.
    *
@@ -415,6 +442,8 @@ export const fetchAllByNextTokenV3 = AwsUtils.fetchAllByNextTokenV3;
 export const fetchAllWithPagination = AwsUtils.fetchAllWithPagination;
 /** @ignore */
 export const fetchAllByMarker = AwsUtils.fetchAllByMarker;
+/** @ignore */
+export const fetchAllByContinuationToken = AwsUtils.fetchAllByContinuationToken;
 /** @ignore */
 export const fetchAllByExclusiveStartKey = AwsUtils.fetchAllByExclusiveStartKey;
 

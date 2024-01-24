@@ -1,4 +1,6 @@
-import { CopyObjectCommand, CopyObjectCommandOutput, DeleteObjectCommand, DeleteObjectCommandOutput, GetObjectCommand, HeadObjectCommand, HeadObjectCommandOutput, S3Client } from '@aws-sdk/client-s3';
+import { CopyObjectCommand, CopyObjectCommandOutput, DeleteObjectCommand, DeleteObjectCommandOutput, GetObjectCommand, HeadObjectCommand, HeadObjectCommandOutput, ListObjectsV2Command, ListObjectsV2CommandInput, PutObjectCommand, PutObjectCommandInput, PutObjectOutput, S3Client } from '@aws-sdk/client-s3';
+
+import { fetchAllByContinuationToken } from './aws-utils';
 
 /**
  * URL encode the object key, and also replace "%20" with " " and "%2F with "/" which is the convention of AWS
@@ -108,4 +110,49 @@ export async function getS3ObjectContentByteArray(s3: S3Client, bucket: string, 
     }),
   );
   return data?.Body ? data.Body.transformToByteArray(): new Uint8Array();
+}
+
+export interface S3ObjectSummary {
+  Key: string;
+  /**
+   * Size of the object, it could be zero for directory objects
+   */
+  Size: number;
+  LastModified: Date;
+  ETag: string;
+  StorageClass: string;
+}
+
+/**
+ * Scan S3 bucket and return both normal objects and directory objects.
+ * Directory objects have keys ending with '/'.
+ * This function handles pagination automatically.
+ * @param s3 S3Client
+ * @param bucket Name of the bucket
+ * @param options Optional settings for the scan
+ * @returns Array of normal and directory objects found
+ */
+export async function scanS3Bucket(s3: S3Client, bucket: string, options?: Partial<Exclude<ListObjectsV2CommandInput, 'Bucket'|'ContinuationToken'>>): Promise<Array<any>> {
+  return await fetchAllByContinuationToken(() => s3.send(new ListObjectsV2Command({
+    Bucket: bucket,
+    ...options,
+  })));
+}
+
+/**
+ * Store content into S3.
+ * @param s3 S3Client
+ * @param bucket Name of the bucket
+ * @param key Key of the object
+ * @param content Content of the object, or undefined if the object is a directory.
+ * @param options Additional options
+ * @returns PutObjectOutput
+ */
+export async function pubS3Object(s3: S3Client, bucket: string, key: string, content: PutObjectCommandInput['Body'], options?: Partial<Exclude<PutObjectCommandInput, 'Bucket'>>): Promise<PutObjectOutput> {
+  return await s3.send(new PutObjectCommand({
+    Bucket: bucket,
+    Key: key,
+    Body: content,
+    ...options,
+  }));
 }

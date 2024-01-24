@@ -19,4 +19,10 @@ describe('s3', () => {
     key = 'xyz/abc/with space in path/with中文.jpg';
     expect(decodeS3ObjectKey(encodeS3ObjectKey(key))).to.equal(key);
   });
+  // it('should scanS3Bucket', async () => {
+  //   const s3 = new S3Client();
+  //   const objs = await scanS3Bucket(s3, '');
+  //   console.log(objs);
+  //   console.log(objs.length);
+  // });
 });
