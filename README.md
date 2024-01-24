@@ -694,6 +694,52 @@ URL encoded object key
 
 ___
 
+##### generatePresignedUrlForDownloading
+
+▸ **generatePresignedUrlForDownloading**(`s3`, `bucket`, `key`, `expiresIn`): `Promise`\<`string`\>
+
+Generate a pre-signed URL for downloading the S3 object
+
+###### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `s3` | `S3Client` | S3Client |
+| `bucket` | `string` | Name of the bucket |
+| `key` | `string` | Key of the object |
+| `expiresIn` | `number` | The number of seconds before the presigned URL expires |
+
+###### Returns
+
+`Promise`\<`string`\>
+
+An URL that can be used to download the S3 object.
+
+___
+
+##### generatePresignedUrlForUploading
+
+▸ **generatePresignedUrlForUploading**(`s3`, `bucket`, `key`, `expiresIn`): `Promise`\<`string`\>
+
+Generate a pre-signed URL for uploading content to the S3 object
+
+###### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `s3` | `S3Client` | S3Client |
+| `bucket` | `string` | Name of the bucket |
+| `key` | `string` | Key of the object |
+| `expiresIn` | `number` | The number of seconds before the presigned URL expires |
+
+###### Returns
+
+`Promise`\<`string`\>
+
+An URL that can be used to upload content to the S3 object.
+
+___
+
 ##### getS3ObjectContentByteArray
 
 ▸ **getS3ObjectContentByteArray**(`s3`, `bucket`, `key`, `range?`): `Promise`\<`Uint8Array`\>
@@ -762,9 +808,9 @@ S3 command output
 
 ___
 
-##### pubS3Object
+##### putS3Object
 
-▸ **pubS3Object**(`s3`, `bucket`, `key`, `content`, `options?`): `Promise`\<`PutObjectOutput`\>
+▸ **putS3Object**(`s3`, `bucket`, `key`, `content`, `options?`): `Promise`\<`PutObjectOutput`\>
 
 Store content into S3.
 
