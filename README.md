@@ -696,7 +696,7 @@ ___
 
 ##### generatePresignedUrlForDownloading
 
-▸ **generatePresignedUrlForDownloading**(`s3`, `bucket`, `key`, `expiresIn`): `Promise`\<`string`\>
+▸ **generatePresignedUrlForDownloading**(`s3`, `bucket`, `key`, `expiresIn`, `options?`): `Promise`\<`string`\>
 
 Generate a pre-signed URL for downloading the S3 object
 
@@ -708,6 +708,7 @@ Generate a pre-signed URL for downloading the S3 object
 | `bucket` | `string` | Name of the bucket |
 | `key` | `string` | Key of the object |
 | `expiresIn` | `number` | The number of seconds before the presigned URL expires |
+| `options?` | `Omit`\<`GetObjectCommandInput`, ``"Bucket"`` \| ``"Key"``\> | Additional options. For example, you can specify content-disposition and content-type in it. |
 
 ###### Returns
 
