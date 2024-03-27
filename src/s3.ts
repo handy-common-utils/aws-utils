@@ -1,7 +1,9 @@
 import { CopyObjectCommand, CopyObjectCommandOutput, DeleteObjectCommand, DeleteObjectCommandOutput, GetObjectCommand, HeadObjectCommand, HeadObjectCommandOutput, ListObjectsV2Command, ListObjectsV2CommandInput, PutObjectCommand, PutObjectCommandInput, PutObjectOutput, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
-import { fetchAllByContinuationToken } from './aws-utils';
+import { PossibleAwsError, fetchAllByContinuationToken } from './aws-utils';
+
+const ERROR_NAME_NO_SUCH_KEY = 'NoSuchKey';
 
 /**
  * URL encode the object key, and also replace "%20" with " " and "%2F with "/" which is the convention of AWS
@@ -60,19 +62,26 @@ export async function copyS3Object(s3: S3Client, srcBucket: string, srcEncodedKe
 }
 
 /**
- * Get details of the S3 object without downloading its content
+ * Get details of the S3 object without downloading its content.
  * @param s3 S3Client
  * @param bucket bucket of the source object
  * @param key object key (without URL encoding)
- * @returns S3 command output
+ * @returns S3 command output, or `undefined` if the object does not exist.
  */
-export async function headS3Object(s3: S3Client, bucket: string, key: string): Promise<HeadObjectCommandOutput> {
-  return s3.send(
-    new HeadObjectCommand({
-      Bucket: bucket,
-      Key: key,
-    }),
-  );
+export async function headS3Object(s3: S3Client, bucket: string, key: string): Promise<HeadObjectCommandOutput | undefined> {
+  try {
+    return await s3.send(
+      new HeadObjectCommand({
+        Bucket: bucket,
+        Key: key,
+      }),
+    );
+  } catch (error) {
+    if ((error as PossibleAwsError).name === ERROR_NAME_NO_SUCH_KEY) {
+      return undefined;
+    }
+    throw error;
+  }
 }
 
 /**
@@ -81,36 +90,54 @@ export async function headS3Object(s3: S3Client, bucket: string, key: string): P
  * @param bucket bucket of the source object
  * @param key object key (without URL encoding)
  * @param encoding Text encoding of the content, if not specified then "utf8" will be used
- * @returns Content of the S3 object as a string. If the object does not have content, an empty string will be returned.
+ * @returns Content of the S3 object as a string.
+ * If the object does not have content, an empty string will be returned.
+ * If the object does not exist, `undefined` will be returned.
  */
-export async function getS3ObjectContentString(s3: S3Client, bucket: string, key: string, encoding = 'utf8'): Promise<string> {
-  const data = await s3.send(
-    new GetObjectCommand({
-      Bucket: bucket,
-      Key: key,
-    }),
-  );
-  return data?.Body ? data.Body.transformToString(encoding) : '';
+export async function getS3ObjectContentString(s3: S3Client, bucket: string, key: string, encoding = 'utf8'): Promise<string | undefined> {
+  try {
+    const data = await s3.send(
+      new GetObjectCommand({
+        Bucket: bucket,
+        Key: key,
+      }),
+    );
+    return data?.Body ? data.Body.transformToString(encoding) : '';  
+  } catch (error) {
+    if ((error as PossibleAwsError).name === ERROR_NAME_NO_SUCH_KEY) {
+      return undefined;
+    }
+    throw error;
+  }
 }
 
 /**
- * Get the content of the S3 object as a string.
+ * Get the content of the S3 object as a Uint8Array.
  * @param s3 S3Client
  * @param bucket bucket of the source object
  * @param key object key (without URL encoding)
  * @param range See https://www.rfc-editor.org/rfc/rfc9110.html#name-range
  * @param encoding Text encoding of the content, if not specified then "utf8" will be used
- * @returns Content of the S3 object as a string. If the object does not have content, an empty string will be returned.
+ * @returns Content of the S3 object as a Uint8Array.
+ * If the object does not have content, an empty Uint8Array will be returned.
+ * If the object does not exist, `undefined` will be returned.
  */
-export async function getS3ObjectContentByteArray(s3: S3Client, bucket: string, key: string, range?: string): Promise<Uint8Array> {
-  const data = await s3.send(
-    new GetObjectCommand({
-      Bucket: bucket,
-      Key: key,
-      Range: range,
-    }),
-  );
-  return data?.Body ? data.Body.transformToByteArray(): new Uint8Array();
+export async function getS3ObjectContentByteArray(s3: S3Client, bucket: string, key: string, range?: string): Promise<Uint8Array | undefined> {
+  try {
+    const data = await s3.send(
+      new GetObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        Range: range,
+      }),
+    );
+    return data?.Body ? data.Body.transformToByteArray(): new Uint8Array();
+  } catch (error) {
+    if ((error as PossibleAwsError).name === ERROR_NAME_NO_SUCH_KEY) {
+      return undefined;
+    }
+    throw error;
+  }
 }
 
 export interface S3ObjectSummary {
