@@ -743,9 +743,9 @@ ___
 
 ##### getS3ObjectContentByteArray
 
-▸ **getS3ObjectContentByteArray**(`s3`, `bucket`, `key`, `range?`): `Promise`\<`Uint8Array`\>
+▸ **getS3ObjectContentByteArray**(`s3`, `bucket`, `key`, `range?`): `Promise`\<`Uint8Array` \| `undefined`\>
 
-Get the content of the S3 object as a string.
+Get the content of the S3 object as a Uint8Array.
 
 ###### Parameters
 
@@ -758,15 +758,17 @@ Get the content of the S3 object as a string.
 
 ###### Returns
 
-`Promise`\<`Uint8Array`\>
+`Promise`\<`Uint8Array` \| `undefined`\>
 
-Content of the S3 object as a string. If the object does not have content, an empty string will be returned.
+Content of the S3 object as a Uint8Array.
+If the object does not have content, an empty Uint8Array will be returned.
+If the object does not exist, `undefined` will be returned.
 
 ___
 
 ##### getS3ObjectContentString
 
-▸ **getS3ObjectContentString**(`s3`, `bucket`, `key`, `encoding?`): `Promise`\<`string`\>
+▸ **getS3ObjectContentString**(`s3`, `bucket`, `key`, `encoding?`): `Promise`\<`string` \| `undefined`\>
 
 Get the content of the S3 object as a string.
 
@@ -781,17 +783,19 @@ Get the content of the S3 object as a string.
 
 ###### Returns
 
-`Promise`\<`string`\>
+`Promise`\<`string` \| `undefined`\>
 
-Content of the S3 object as a string. If the object does not have content, an empty string will be returned.
+Content of the S3 object as a string.
+If the object does not have content, an empty string will be returned.
+If the object does not exist, `undefined` will be returned.
 
 ___
 
 ##### headS3Object
 
-▸ **headS3Object**(`s3`, `bucket`, `key`): `Promise`\<`HeadObjectCommandOutput`\>
+▸ **headS3Object**(`s3`, `bucket`, `key`): `Promise`\<`HeadObjectCommandOutput` \| `undefined`\>
 
-Get details of the S3 object without downloading its content
+Get details of the S3 object without downloading its content.
 
 ###### Parameters
 
@@ -803,9 +807,9 @@ Get details of the S3 object without downloading its content
 
 ###### Returns
 
-`Promise`\<`HeadObjectCommandOutput`\>
+`Promise`\<`HeadObjectCommandOutput` \| `undefined`\>
 
-S3 command output
+S3 command output, or `undefined` if the object does not exist.
 
 ___
 
