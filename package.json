@@ -47,9 +47,9 @@
     "@unbounce/parse-aws-arn": "^1.2.2"
   },
   "optionalDependencies": {
-    "@aws-sdk/s3-request-presigner": "^3.498.0",
-    "@aws-sdk/client-s3": "^3.485.0",
-    "@aws-sdk/client-ssm": "^3.485.0"
+    "@aws-sdk/client-s3": "^3.576.0",
+    "@aws-sdk/client-ssm": "^3.576.0",
+    "@aws-sdk/s3-request-presigner": "^3.576.0"
   },
   "bundleDependencies": [
     "@unbounce/parse-aws-arn"
