@@ -3,8 +3,6 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 import { PossibleAwsError, fetchAllByContinuationToken } from './aws-utils';
 
-const ERROR_NAME_NO_SUCH_KEY = 'NoSuchKey';
-
 /**
  * URL encode the object key, and also replace "%20" with " " and "%2F with "/" which is the convention of AWS
  * @param key The S3 object key before encoding
@@ -66,9 +64,12 @@ export async function copyS3Object(s3: S3Client, srcBucket: string, srcEncodedKe
  * @param s3 S3Client
  * @param bucket bucket of the source object
  * @param key object key (without URL encoding)
+ * @param treat403AsNonExisting If this flag is true, then 403 response from AWS is considered as the object does not exist.
+ *                              Otherwise, only 404 response from AWS is considered as the object does not exist.
+ *                              Background info: If the caller does not have s3:ListBucket permission, AWS responses with 403 when the object does not exists.
  * @returns S3 command output, or `undefined` if the object does not exist.
  */
-export async function headS3Object(s3: S3Client, bucket: string, key: string): Promise<HeadObjectCommandOutput | undefined> {
+export async function headS3Object(s3: S3Client, bucket: string, key: string, treat403AsNonExisting = false): Promise<HeadObjectCommandOutput | undefined> {
   try {
     return await s3.send(
       new HeadObjectCommand({
@@ -77,7 +78,7 @@ export async function headS3Object(s3: S3Client, bucket: string, key: string): P
       }),
     );
   } catch (error) {
-    if ((error as PossibleAwsError).name === ERROR_NAME_NO_SUCH_KEY) {
+    if ((error as PossibleAwsError).$metadata?.httpStatusCode === 404 || treat403AsNonExisting && (error as PossibleAwsError).$metadata?.httpStatusCode === 403) {
       return undefined;
     }
     throw error;
@@ -104,7 +105,7 @@ export async function getS3ObjectContentString(s3: S3Client, bucket: string, key
     );
     return data?.Body ? data.Body.transformToString(encoding) : '';  
   } catch (error) {
-    if ((error as PossibleAwsError).name === ERROR_NAME_NO_SUCH_KEY) {
+    if ((error as PossibleAwsError).$metadata?.httpStatusCode === 404) {
       return undefined;
     }
     throw error;
@@ -133,7 +134,7 @@ export async function getS3ObjectContentByteArray(s3: S3Client, bucket: string, 
     );
     return data?.Body ? data.Body.transformToByteArray(): new Uint8Array();
   } catch (error) {
-    if ((error as PossibleAwsError).name === ERROR_NAME_NO_SUCH_KEY) {
+    if ((error as PossibleAwsError).$metadata?.httpStatusCode === 404) {
       return undefined;
     }
     throw error;
