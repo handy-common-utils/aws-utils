@@ -793,17 +793,18 @@ ___
 
 ##### headS3Object
 
-▸ **headS3Object**(`s3`, `bucket`, `key`): `Promise`\<`HeadObjectCommandOutput` \| `undefined`\>
+▸ **headS3Object**(`s3`, `bucket`, `key`, `treat403AsNonExisting?`): `Promise`\<`HeadObjectCommandOutput` \| `undefined`\>
 
 Get details of the S3 object without downloading its content.
 
 ###### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `s3` | `S3Client` | S3Client |
-| `bucket` | `string` | bucket of the source object |
-| `key` | `string` | object key (without URL encoding) |
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `s3` | `S3Client` | `undefined` | S3Client |
+| `bucket` | `string` | `undefined` | bucket of the source object |
+| `key` | `string` | `undefined` | object key (without URL encoding) |
+| `treat403AsNonExisting` | `boolean` | `false` | If this flag is true, then 403 response from AWS is considered as the object does not exist. Otherwise, only 404 response from AWS is considered as the object does not exist. Background info: If the caller does not have s3:ListBucket permission, AWS responses with 403 when the object does not exists. |
 
 ###### Returns
 
