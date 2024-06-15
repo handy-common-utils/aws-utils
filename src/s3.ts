@@ -151,13 +151,20 @@ export type S3ObjectSummary = Exclude<ListObjectsV2CommandOutput['Contents'], un
  * @param s3 S3Client
  * @param bucket Name of the bucket
  * @param options Optional settings for the scan
+ * @param filterFunc Optional filter function to filter out objects based on certain conditions.
+ *        This function is called for each paged output during pagination.
+ *        For finding few interested objects in a bucket having huge number of object,
+ *        utilising this function can avoid keeping too many useless array entries in memory.
  * @returns Array of normal and directory objects found
  */
-export async function scanS3Bucket(s3: S3Client, bucket: string, options?: Partial<Exclude<ListObjectsV2CommandInput, 'Bucket'|'ContinuationToken'>>): Promise<Array<S3ObjectSummary>> {
+export async function scanS3Bucket(s3: S3Client, bucket: string, options?: Partial<Exclude<ListObjectsV2CommandInput, 'Bucket'|'ContinuationToken'>>, filterFunc?: (entry: S3ObjectSummary) => boolean): Promise<Array<S3ObjectSummary>> {
   return await fetchAllByContinuationToken(() => s3.send(new ListObjectsV2Command({
     Bucket: bucket,
     ...options,
-  })));
+  })),
+  'Contents',
+  filterFunc,
+  );
 }
 
 /**
