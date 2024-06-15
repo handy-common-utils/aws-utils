@@ -136,7 +136,7 @@ ___
 
 ##### fetchAllByContinuationToken
 
-▸ `Static` **fetchAllByContinuationToken**\<`T`, `M`\>(`fetchItemsByContinuationToken`, `itemsFieldName?`): `Promise`\<`T`[]\>
+▸ `Static` **fetchAllByContinuationToken**\<`T`, `M`\>(`fetchItemsByContinuationToken`, `itemsFieldName?`, `filterFunc?`): `Promise`\<`T`[]\>
 
 Fetch all items through repeatedly calling API with ContinuationToken/NextContinuationToken based pagination.
 This function is useful for client side pagination when the response from AWS API contains NextContinuationToken and items fields.
@@ -154,6 +154,7 @@ This function is useful for client side pagination when the response from AWS AP
 | :------ | :------ | :------ | :------ |
 | `fetchItemsByContinuationToken` | `FetchItemsFunction`\<\{ `ContinuationToken?`: `M`  }, \{ `NextContinuationToken?`: `M`  }\> | `undefined` | the function for fetching one batch/page of items by ContinuationToken |
 | `itemsFieldName` | `string` | `'Contents'` | name of the field containing returned items in AWS API response |
+| `filterFunc?` | (`entry`: `T`) => `boolean` | `undefined` | Optional filter function to filter out objects based on certain conditions. This function is called for each paged output during pagination. For finding few interested items in a huge number of entries, utilising this function can avoid keeping too many useless array entries in memory. |
 
 ###### Returns
 
@@ -171,7 +172,7 @@ ___
 
 ##### fetchAllByExclusiveStartKey
 
-▸ `Static` **fetchAllByExclusiveStartKey**\<`T`, `K`\>(`fetchItemsByExclusiveStartKey`, `itemsFieldName?`): `Promise`\<`T`[]\>
+▸ `Static` **fetchAllByExclusiveStartKey**\<`T`, `K`\>(`fetchItemsByExclusiveStartKey`, `itemsFieldName?`, `filterFunc?`): `Promise`\<`T`[]\>
 
 Fetch all items through repeatedly calling API with ExclusiveStartKey/LastEvaluatedKey based pagination.
 This function is useful for client side pagination when the response from AWS API contains LastEvaluatedKey and items fields.
@@ -189,6 +190,7 @@ This function is useful for client side pagination when the response from AWS AP
 | :------ | :------ | :------ | :------ |
 | `fetchItemsByExclusiveStartKey` | `FetchItemsFunction`\<\{ `ExclusiveStartKey?`: `K`  }, \{ `LastEvaluatedKey?`: `K`  }\> | `undefined` | the function for fetching one batch/page of items by ExclusiveStartKey |
 | `itemsFieldName` | `string` | `'Items'` | name of the field containing returned items in AWS API response, the default value is 'Items' |
+| `filterFunc?` | (`entry`: `T`) => `boolean` | `undefined` | Optional filter function to filter out objects based on certain conditions. This function is called for each paged output during pagination. For finding few interested items in a huge number of entries, utilising this function can avoid keeping too many useless array entries in memory. |
 
 ###### Returns
 
@@ -208,7 +210,7 @@ ___
 
 ##### fetchAllByMarker
 
-▸ `Static` **fetchAllByMarker**\<`T`, `M`\>(`fetchItemsByMarker`, `itemsFieldName`): `Promise`\<`T`[]\>
+▸ `Static` **fetchAllByMarker**\<`T`, `M`\>(`fetchItemsByMarker`, `itemsFieldName`, `filterFunc?`): `Promise`\<`T`[]\>
 
 Fetch all items through repeatedly calling API with Marker/NextMarker based pagination.
 This function is useful for client side pagination when the response from AWS API contains NextMarker and items fields.
@@ -226,6 +228,7 @@ This function is useful for client side pagination when the response from AWS AP
 | :------ | :------ | :------ |
 | `fetchItemsByMarker` | `FetchItemsFunction`\<\{ `Marker?`: `M`  }, \{ `NextMarker?`: `M`  }\> | the function for fetching one batch/page of items by Marker |
 | `itemsFieldName` | `string` | name of the field containing returned items in AWS API response |
+| `filterFunc?` | (`entry`: `T`) => `boolean` | Optional filter function to filter out objects based on certain conditions. This function is called for each paged output during pagination. For finding few interested items in a huge number of entries, utilising this function can avoid keeping too many useless array entries in memory. |
 
 ###### Returns
 
@@ -246,7 +249,7 @@ ___
 
 ##### fetchAllByNextToken
 
-▸ `Static` **fetchAllByNextToken**\<`T`, `K`\>(`fetchItemsByNextToken`, `itemsFieldName`): `Promise`\<`T`[]\>
+▸ `Static` **fetchAllByNextToken**\<`T`, `K`\>(`fetchItemsByNextToken`, `itemsFieldName`, `filterFunc?`): `Promise`\<`T`[]\>
 
 Fetch all items through repeatedly calling API with NextToken based pagination.
 This function is useful for client side pagination when the response from AWS API contains NextToken and items fields.
@@ -264,6 +267,7 @@ This function is useful for client side pagination when the response from AWS AP
 | :------ | :------ | :------ |
 | `fetchItemsByNextToken` | `FetchItemsFunction`\<\{ `NextToken?`: `K`  }, \{ `NextToken?`: `K`  }\> | the function for fetching one batch/page of items by NextToken |
 | `itemsFieldName` | `string` | name of the field containing returned items in AWS API response |
+| `filterFunc?` | (`entry`: `T`) => `boolean` | Optional filter function to filter out objects based on certain conditions. This function is called for each paged output during pagination. For finding few interested items in a huge number of entries, utilising this function can avoid keeping too many useless array entries in memory. |
 
 ###### Returns
 
@@ -284,7 +288,7 @@ ___
 
 ##### fetchAllByNextTokenV3
 
-▸ `Static` **fetchAllByNextTokenV3**\<`T`, `K`\>(`fetchItemsByNextToken`, `itemsFieldName`): `Promise`\<`T`[]\>
+▸ `Static` **fetchAllByNextTokenV3**\<`T`, `K`\>(`fetchItemsByNextToken`, `itemsFieldName`, `filterFunc?`): `Promise`\<`T`[]\>
 
 Fetch all items through repeatedly calling API with nextToken based pagination which is used in aws-sdk v3.
 This function is useful for client side pagination when the response from AWS API contains nextToken and items fields.
@@ -302,6 +306,7 @@ This function is useful for client side pagination when the response from AWS AP
 | :------ | :------ | :------ |
 | `fetchItemsByNextToken` | `FetchItemsFunction`\<\{ `nextToken?`: `K`  }, \{ `nextToken?`: `K`  }\> | the function for fetching one batch/page of items by nextToken |
 | `itemsFieldName` | `string` | name of the field containing returned items in AWS API response |
+| `filterFunc?` | (`entry`: `T`) => `boolean` | Optional filter function to filter out objects based on certain conditions. This function is called for each paged output during pagination. For finding few interested items in a huge number of entries, utilising this function can avoid keeping too many useless array entries in memory. |
 
 ###### Returns
 
@@ -326,7 +331,7 @@ ___
 
 ##### fetchAllByPosition
 
-▸ `Static` **fetchAllByPosition**\<`T`, `P`\>(`fetchItemsByPosition`, `itemsFieldName?`): `Promise`\<`T`[]\>
+▸ `Static` **fetchAllByPosition**\<`T`, `P`\>(`fetchItemsByPosition`, `itemsFieldName?`, `filterFunc?`): `Promise`\<`T`[]\>
 
 Fetch all items through repeatedly calling API with position based pagination.
 This function is useful for client side pagination when the response from AWS API contains position and items fields.
@@ -344,6 +349,7 @@ This function is useful for client side pagination when the response from AWS AP
 | :------ | :------ | :------ | :------ |
 | `fetchItemsByPosition` | `FetchItemsFunction`\<\{ `position?`: `P`  }, \{ `position?`: `P`  }\> | `undefined` | the function for fetching one batch/page of items by position |
 | `itemsFieldName` | `string` | `'items'` | name of the field containing returned items in AWS API response, default value is 'items' |
+| `filterFunc?` | (`entry`: `T`) => `boolean` | `undefined` | Optional filter function to filter out objects based on certain conditions. This function is called for each paged output during pagination. For finding few interested items in a huge number of entries, utilising this function can avoid keeping too many useless array entries in memory. |
 
 ###### Returns
 
@@ -363,7 +369,7 @@ ___
 
 ##### fetchAllWithPagination
 
-▸ `Static` **fetchAllWithPagination**\<`IT`, `RT`, `IFN`, `PFN`, `PFT`\>(`fetchOnePageOfItems`, `itemsFieldName`, `paginationFieldName`, `shouldFetchNextPage?`): `Promise`\<`Exclude`\<`RT`[`IFN`], `undefined`\>\>
+▸ `Static` **fetchAllWithPagination**\<`IT`, `RT`, `IFN`, `PFN`, `PFT`\>(`fetchOnePageOfItems`, `itemsFieldName`, `paginationFieldName`, `shouldFetchNextPage?`, `filterFunc?`): `Promise`\<`Exclude`\<`RT`[`IFN`], `undefined`\>\>
 
 Fetch all items through repeatedly calling pagination based API.
 This function is useful for client side pagination when the calling AWS API.
@@ -386,6 +392,7 @@ This function is useful for client side pagination when the calling AWS API.
 | `itemsFieldName` | `IFN` | name of the field containing returned items in AWS API response |
 | `paginationFieldName` | `PFN` | name of the field containing the pagination token in AWS API response, such like "ExclusiveStartKey", "Marker", "NextToken", "nextToken" |
 | `shouldFetchNextPage?` | (`response`: `RT`) => `boolean` | a function to determine if the fetch should continue, the default value is always true and will continue fetching items until the response does not contain nextToken field. |
+| `filterFunc?` | (`entry`: `IT`) => `boolean` | Optional filter function to filter out objects based on certain conditions. This function is called for each paged output during pagination. For finding few interested items in a huge number of entries, utilising this function can avoid keeping too many useless array entries in memory. |
 
 ###### Returns
 
@@ -521,25 +528,7 @@ result came out from the last attempt
 
 promiseWithRetry
 
-## Interfaces
-
-
-<a name="interfacess3s3objectsummarymd"></a>
-
-### Interface: S3ObjectSummary
-
-[s3](#moduless3md).S3ObjectSummary
-
-#### Properties
-
-| Property | Description |
-| --- | --- |
-| **ETag**: `string` |  |
-| **Key**: `string` |  |
-| **LastModified**: `Date` |  |
-| **Size**: `number` | Size of the object, it could be zero for directory objects |
-| **StorageClass**: `string` | ## Modules |
-
+## Modules
 
 
 <a name="modulesaws_utilsmd"></a>
@@ -601,15 +590,17 @@ An error that is possibly generated by AWS SDK v2 or v3
 
 ### Module: s3
 
-#### Interfaces
+#### Type Aliases
 
-- [S3ObjectSummary](#interfacess3s3objectsummarymd)
+##### S3ObjectSummary
+
+Ƭ **S3ObjectSummary**: `Exclude`\<`ListObjectsV2CommandOutput`[``"Contents"``], `undefined`\>[``0``]
 
 #### Functions
 
 ##### copyS3Object
 
-▸ **copyS3Object**(`s3`, `srcBucket`, `srcEncodedKey`, `destDecodedKey`, `metadata?`, `destBucket?`): `Promise`\<`CopyObjectCommandOutput`\>
+▸ **copyS3Object**(`s3`, `srcBucket`, `srcEncodedKey`, `destDecodedKey`, `metadata?`, `destBucket?`, `options?`): `Promise`\<`CopyObjectCommandOutput`\>
 
 Copy S3 object
 
@@ -623,6 +614,7 @@ Copy S3 object
 | `destDecodedKey` | `string` | key (NOT URL encoded) of the destination object |
 | `metadata?` | `Record`\<`string`, `string`\> | metadata to be set on the destination object, if it is not specified then the metadata from source object will be copied |
 | `destBucket?` | `string` | bucket of the destination object, if it is not specified then the source bucket will be used |
+| `options?` | `Partial`\<`CopyObjectCommandInput`\> | Additional options for the CopyObjectCommand |
 
 ###### Returns
 
@@ -654,7 +646,7 @@ ___
 
 ##### deleteS3Object
 
-▸ **deleteS3Object**(`s3`, `bucket`, `key`): `Promise`\<`DeleteObjectCommandOutput`\>
+▸ **deleteS3Object**(`s3`, `bucket`, `key`, `options?`): `Promise`\<`DeleteObjectCommandOutput`\>
 
 Delete an S3 object. No error would be thrown if the object does not exist.
 
@@ -665,6 +657,7 @@ Delete an S3 object. No error would be thrown if the object does not exist.
 | `s3` | `S3Client` | S3Client |
 | `bucket` | `string` | bucket name |
 | `key` | `string` | object key (without URL encoding) |
+| `options?` | `Partial`\<`DeleteObjectCommandInput`\> | Additional options for the DeleteObjectCommand |
 
 ###### Returns
 
@@ -696,7 +689,7 @@ ___
 
 ##### generatePresignedUrlForDownloading
 
-▸ **generatePresignedUrlForDownloading**(`s3`, `bucket`, `key`, `expiresIn`, `options?`): `Promise`\<`string`\>
+▸ **generatePresignedUrlForDownloading**(`s3`, `bucket`, `key`, `expiresIn?`, `options?`): `Promise`\<`string`\>
 
 Generate a pre-signed URL for downloading the S3 object
 
@@ -707,7 +700,7 @@ Generate a pre-signed URL for downloading the S3 object
 | `s3` | `S3Client` | S3Client |
 | `bucket` | `string` | Name of the bucket |
 | `key` | `string` | Key of the object |
-| `expiresIn` | `number` | The number of seconds before the presigned URL expires |
+| `expiresIn?` | `number` | The number of seconds before the presigned URL expires |
 | `options?` | `Omit`\<`GetObjectCommandInput`, ``"Bucket"`` \| ``"Key"``\> | Additional options. For example, you can specify content-disposition and content-type in it. |
 
 ###### Returns
@@ -720,7 +713,7 @@ ___
 
 ##### generatePresignedUrlForUploading
 
-▸ **generatePresignedUrlForUploading**(`s3`, `bucket`, `key`, `expiresIn`): `Promise`\<`string`\>
+▸ **generatePresignedUrlForUploading**(`s3`, `bucket`, `key`, `expiresIn?`, `options?`): `Promise`\<`string`\>
 
 Generate a pre-signed URL for uploading content to the S3 object
 
@@ -731,7 +724,8 @@ Generate a pre-signed URL for uploading content to the S3 object
 | `s3` | `S3Client` | S3Client |
 | `bucket` | `string` | Name of the bucket |
 | `key` | `string` | Key of the object |
-| `expiresIn` | `number` | The number of seconds before the presigned URL expires |
+| `expiresIn?` | `number` | The number of seconds before the presigned URL expires |
+| `options?` | `Omit`\<`PutObjectCommandInput`, ``"Bucket"`` \| ``"Key"``\> | Additional options |
 
 ###### Returns
 
@@ -741,9 +735,33 @@ An URL that can be used to upload content to the S3 object.
 
 ___
 
+##### getS3Object
+
+▸ **getS3Object**(`s3`, `bucket`, `key`, `options?`): `Promise`\<`GetObjectCommandOutput` \| `undefined`\>
+
+Get the details (including the content) of the S3 object.
+
+###### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `s3` | `S3Client` | S3Client |
+| `bucket` | `string` | bucket of the source object |
+| `key` | `string` | object key (without URL encoding) |
+| `options?` | `Partial`\<`GetObjectCommandInput`\> | Additional options for the GetObjectCommand |
+
+###### Returns
+
+`Promise`\<`GetObjectCommandOutput` \| `undefined`\>
+
+details (including the content) of the S3 object.
+If the object does not exist, `undefined` will be returned.
+
+___
+
 ##### getS3ObjectContentByteArray
 
-▸ **getS3ObjectContentByteArray**(`s3`, `bucket`, `key`, `range?`): `Promise`\<`Uint8Array` \| `undefined`\>
+▸ **getS3ObjectContentByteArray**(`s3`, `bucket`, `key`, `range?`, `options?`): `Promise`\<`Uint8Array` \| `undefined`\>
 
 Get the content of the S3 object as a Uint8Array.
 
@@ -755,6 +773,7 @@ Get the content of the S3 object as a Uint8Array.
 | `bucket` | `string` | bucket of the source object |
 | `key` | `string` | object key (without URL encoding) |
 | `range?` | `string` | See https://www.rfc-editor.org/rfc/rfc9110.html#name-range |
+| `options?` | `Partial`\<`GetObjectCommandInput`\> | Additional options for the GetObjectCommand |
 
 ###### Returns
 
@@ -768,7 +787,7 @@ ___
 
 ##### getS3ObjectContentString
 
-▸ **getS3ObjectContentString**(`s3`, `bucket`, `key`, `encoding?`): `Promise`\<`string` \| `undefined`\>
+▸ **getS3ObjectContentString**(`s3`, `bucket`, `key`, `encoding?`, `options?`): `Promise`\<`string` \| `undefined`\>
 
 Get the content of the S3 object as a string.
 
@@ -780,6 +799,7 @@ Get the content of the S3 object as a string.
 | `bucket` | `string` | `undefined` | bucket of the source object |
 | `key` | `string` | `undefined` | object key (without URL encoding) |
 | `encoding` | `string` | `'utf8'` | Text encoding of the content, if not specified then "utf8" will be used |
+| `options?` | `Partial`\<`GetObjectCommandInput`\> | `undefined` | Additional options for the GetObjectCommand |
 
 ###### Returns
 
@@ -793,7 +813,7 @@ ___
 
 ##### headS3Object
 
-▸ **headS3Object**(`s3`, `bucket`, `key`, `treat403AsNonExisting?`): `Promise`\<`HeadObjectCommandOutput` \| `undefined`\>
+▸ **headS3Object**(`s3`, `bucket`, `key`, `treat403AsNonExisting?`, `options?`): `Promise`\<`HeadObjectCommandOutput` \| `undefined`\>
 
 Get details of the S3 object without downloading its content.
 
@@ -805,12 +825,38 @@ Get details of the S3 object without downloading its content.
 | `bucket` | `string` | `undefined` | bucket of the source object |
 | `key` | `string` | `undefined` | object key (without URL encoding) |
 | `treat403AsNonExisting` | `boolean` | `false` | If this flag is true, then 403 response from AWS is considered as the object does not exist. Otherwise, only 404 response from AWS is considered as the object does not exist. Background info: If the caller does not have s3:ListBucket permission, AWS responses with 403 when the object does not exists. |
+| `options?` | `Partial`\<`HeadObjectCommandInput`\> | `undefined` | Additional options for the HeadObjectCommand |
 
 ###### Returns
 
 `Promise`\<`HeadObjectCommandOutput` \| `undefined`\>
 
 S3 command output, or `undefined` if the object does not exist.
+
+___
+
+##### listS3Objects
+
+▸ **listS3Objects**(`s3`, `bucket`, `options?`, `filterFunc?`): `Promise`\<\{ `commonPrefixes`: `CommonPrefix`[] ; `contents`: [`S3ObjectSummary`](#s3objectsummary)[]  }\>
+
+Scan S3 bucket and return both normal objects and directory objects.
+Directory objects have keys ending with '/'.
+This function handles pagination automatically.
+
+###### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `s3` | `S3Client` | S3Client |
+| `bucket` | `string` | Name of the bucket |
+| `options?` | `Partial`\<`ListObjectsV2CommandInput`\> | Optional settings for the scan |
+| `filterFunc?` | (`entry`: `_Object` \| `CommonPrefix`) => `boolean` | Optional filter function to filter out objects based on certain conditions. This function is called for each paged output during pagination. For finding few interested objects in a bucket having huge number of object, utilising this function can avoid keeping too many useless array entries in memory. |
+
+###### Returns
+
+`Promise`\<\{ `commonPrefixes`: `CommonPrefix`[] ; `contents`: [`S3ObjectSummary`](#s3objectsummary)[]  }\>
+
+Array of normal and directory objects found
 
 ___
 
@@ -840,7 +886,7 @@ ___
 
 ##### scanS3Bucket
 
-▸ **scanS3Bucket**(`s3`, `bucket`, `options?`): `Promise`\<[`S3ObjectSummary`](#interfacess3s3objectsummarymd)[]\>
+▸ **scanS3Bucket**(`s3`, `bucket`, `options?`, `filterFunc?`): `Promise`\<[`S3ObjectSummary`](#s3objectsummary)[]\>
 
 Scan S3 bucket and return both normal objects and directory objects.
 Directory objects have keys ending with '/'.
@@ -853,10 +899,11 @@ This function handles pagination automatically.
 | `s3` | `S3Client` | S3Client |
 | `bucket` | `string` | Name of the bucket |
 | `options?` | `Partial`\<`ListObjectsV2CommandInput`\> | Optional settings for the scan |
+| `filterFunc?` | (`entry`: `_Object`) => `boolean` | Optional filter function to filter out objects based on certain conditions. This function is called for each paged output during pagination. For finding few interested objects in a bucket having huge number of object, utilising this function can avoid keeping too many useless array entries in memory. |
 
 ###### Returns
 
-`Promise`\<[`S3ObjectSummary`](#interfacess3s3objectsummarymd)[]\>
+`Promise`\<[`S3ObjectSummary`](#s3objectsummary)[]\>
 
 Array of normal and directory objects found
 
