@@ -128,16 +128,24 @@ export abstract class AwsUtils {
    *
    * @param fetchItemsByPosition the function for fetching one batch/page of items by position
    * @param itemsFieldName    name of the field containing returned items in AWS API response, default value is 'items'
+   * @param filterFunc Optional filter function to filter out objects based on certain conditions.
+   *        This function is called for each paged output during pagination.
+   *        For finding few interested items in a huge number of entries,
+   *        utilising this function can avoid keeping too many useless array entries in memory.
    * @returns all items fetched
    */
   static async fetchAllByPosition<T, P = string>(
     fetchItemsByPosition: FetchItemsFunction<{ position?: P }, { position?: P }>,
     itemsFieldName = 'items',
+    filterFunc?: (entry: T) => boolean,
   ): Promise<T[]> {
     return PromiseUtils.repeat(
       awaitItems(fetchItemsByPosition),
       response => response.position ? { position: response.position } : null,
-      (collection, response: any) => response[itemsFieldName] ? collection.concat(response[itemsFieldName] as Array<T>) : collection,
+      (collection, response: any) => {
+        const entries = response[itemsFieldName] as Array<T>;
+        return Array.isArray(entries) ? collection.concat(filterFunc ? entries.filter((entry) => filterFunc(entry)) : entries) : collection;
+      },
       [] as Array<T>,
     );
   }
@@ -156,16 +164,24 @@ export abstract class AwsUtils {
    *
    * @param fetchItemsByNextToken the function for fetching one batch/page of items by NextToken
    * @param itemsFieldName    name of the field containing returned items in AWS API response
+   * @param filterFunc Optional filter function to filter out objects based on certain conditions.
+   *        This function is called for each paged output during pagination.
+   *        For finding few interested items in a huge number of entries,
+   *        utilising this function can avoid keeping too many useless array entries in memory.
    * @returns all items fetched
    */
   static async fetchAllByNextToken<T, K = string>(
     fetchItemsByNextToken: FetchItemsFunction<{ NextToken?: K }, { NextToken?: K }>,
     itemsFieldName: string,
+    filterFunc?: (entry: T) => boolean,
   ): Promise<T[]> {
     return PromiseUtils.repeat(
       awaitItems(fetchItemsByNextToken),
       response => response.NextToken ? { NextToken: response.NextToken } : null,
-      (collection, response: any) => response[itemsFieldName] ? collection.concat(response[itemsFieldName] as Array<T>) : collection,
+      (collection, response: any) => {
+        const entries = response[itemsFieldName] as Array<T>;
+        return Array.isArray(entries) ? collection.concat(filterFunc ? entries.filter((entry) => filterFunc(entry)) : entries) : collection;
+      },
       [] as Array<T>,
     );
   }
@@ -197,6 +213,10 @@ export abstract class AwsUtils {
    * @param paginationFieldName   name of the field containing the pagination token in AWS API response, such like "ExclusiveStartKey", "Marker", "NextToken", "nextToken"
    * @param shouldFetchNextPage   a function to determine if the fetch should continue, the default value is always true
    *                              and will continue fetching items until the response does not contain nextToken field.
+   * @param filterFunc Optional filter function to filter out objects based on certain conditions.
+   *        This function is called for each paged output during pagination.
+   *        For finding few interested items in a huge number of entries,
+   *        utilising this function can avoid keeping too many useless array entries in memory.
    * @returns all items fetched
    */
   static async fetchAllWithPagination<IT, RT extends Record<IFN, IT[]|undefined> & Partial<Record<PFN, PFT>>, IFN extends string, PFN extends string, PFT = string>(
@@ -204,11 +224,15 @@ export abstract class AwsUtils {
     itemsFieldName: IFN,
     paginationFieldName: PFN,
     shouldFetchNextPage?: (response: RT) => boolean,
+    filterFunc?: (entry: IT) => boolean,
   ): Promise<Exclude<RT[IFN], undefined>> {
     return PromiseUtils.repeat(
       awaitItems(fetchOnePageOfItems),
       response => (!shouldFetchNextPage || shouldFetchNextPage(response)) ? (response[paginationFieldName] ? ({ [paginationFieldName]: response[paginationFieldName] }) as unknown as Record<PFN, PFT> : null) : null,
-      (collection, response) => response[itemsFieldName] ? collection.concat(response[itemsFieldName]!) : collection,
+      (collection, response: any) => {
+        const entries = response[itemsFieldName] as Array<IT>;
+        return Array.isArray(entries) ? collection.concat(filterFunc ? entries.filter((entry) => filterFunc(entry)) : entries) : collection;
+      },
       [] as Array<IT>,
     ) as Promise<Exclude<RT[IFN], undefined>>;
   }
@@ -231,16 +255,24 @@ export abstract class AwsUtils {
    *
    * @param fetchItemsByNextToken the function for fetching one batch/page of items by nextToken
    * @param itemsFieldName    name of the field containing returned items in AWS API response
+   * @param filterFunc Optional filter function to filter out objects based on certain conditions.
+   *        This function is called for each paged output during pagination.
+   *        For finding few interested items in a huge number of entries,
+   *        utilising this function can avoid keeping too many useless array entries in memory.
    * @returns all items fetched
    */
   static async fetchAllByNextTokenV3<T, K = string>(
     fetchItemsByNextToken: FetchItemsFunction<{ nextToken?: K }, { nextToken?: K }>,
     itemsFieldName: string,
+    filterFunc?: (entry: T) => boolean,
   ): Promise<T[]> {
     return PromiseUtils.repeat(
       awaitItems(fetchItemsByNextToken),
       response => response.nextToken ? { nextToken: response.nextToken } : null,
-      (collection, response: any) => response[itemsFieldName] ? collection.concat(response[itemsFieldName] as Array<T>) : collection,
+      (collection, response: any) => {
+        const entries = response[itemsFieldName] as Array<T>;
+        return Array.isArray(entries) ? collection.concat(filterFunc ? entries.filter((entry) => filterFunc(entry)) : entries) : collection;
+      },
       [] as Array<T>,
     );
   }
@@ -258,16 +290,24 @@ export abstract class AwsUtils {
    *
    * @param fetchItemsByMarker the function for fetching one batch/page of items by Marker
    * @param itemsFieldName    name of the field containing returned items in AWS API response
+   * @param filterFunc Optional filter function to filter out objects based on certain conditions.
+   *        This function is called for each paged output during pagination.
+   *        For finding few interested items in a huge number of entries,
+   *        utilising this function can avoid keeping too many useless array entries in memory.
    * @returns all items fetched
    */
   static async fetchAllByMarker<T, M = string>(
     fetchItemsByMarker: FetchItemsFunction<{ Marker?: M }, { NextMarker?: M }>,
     itemsFieldName: string,
+    filterFunc?: (entry: T) => boolean,
   ): Promise<T[]> {
     return PromiseUtils.repeat(
       awaitItems(fetchItemsByMarker),
       response => response.NextMarker ? { Marker: response.NextMarker } : null,
-      (collection, response: any) => response[itemsFieldName] ? collection.concat(response[itemsFieldName] as Array<T>) : collection,
+      (collection, response: any) => {
+        const entries = response[itemsFieldName] as Array<T>;
+        return Array.isArray(entries) ? collection.concat(filterFunc ? entries.filter((entry) => filterFunc(entry)) : entries) : collection;
+      },
       [] as Array<T>,
     );
   }
@@ -283,16 +323,24 @@ export abstract class AwsUtils {
    *
    * @param fetchItemsByContinuationToken the function for fetching one batch/page of items by ContinuationToken
    * @param itemsFieldName    name of the field containing returned items in AWS API response
+   * @param filterFunc Optional filter function to filter out objects based on certain conditions.
+   *        This function is called for each paged output during pagination.
+   *        For finding few interested items in a huge number of entries,
+   *        utilising this function can avoid keeping too many useless array entries in memory.
    * @returns all items fetched
    */
   static async fetchAllByContinuationToken<T, M = string>(
     fetchItemsByContinuationToken: FetchItemsFunction<{ ContinuationToken?: M }, { NextContinuationToken?: M }>,
     itemsFieldName: string = 'Contents',
+    filterFunc?: (entry: T) => boolean,
   ): Promise<T[]> {
     return PromiseUtils.repeat(
       awaitItems(fetchItemsByContinuationToken),
       response => response.NextContinuationToken ? { ContinuationToken: response.NextContinuationToken } : null,
-      (collection, response: any) => response[itemsFieldName] ? collection.concat(response[itemsFieldName] as Array<T>) : collection,
+      (collection, response: any) => {
+        const entries = response[itemsFieldName] as Array<T>;
+        return Array.isArray(entries) ? collection.concat(filterFunc ? entries.filter((entry) => filterFunc(entry)) : entries) : collection;
+      },
       [] as Array<T>,
     );
   }
@@ -310,16 +358,24 @@ export abstract class AwsUtils {
    *
    * @param fetchItemsByExclusiveStartKey the function for fetching one batch/page of items by ExclusiveStartKey
    * @param itemsFieldName    name of the field containing returned items in AWS API response, the default value is 'Items'
+   * @param filterFunc Optional filter function to filter out objects based on certain conditions.
+   *        This function is called for each paged output during pagination.
+   *        For finding few interested items in a huge number of entries,
+   *        utilising this function can avoid keeping too many useless array entries in memory.
    * @returns all items fetched
    */
   static async fetchAllByExclusiveStartKey<T, K = { [key: string]: any }>(
     fetchItemsByExclusiveStartKey: FetchItemsFunction<{ ExclusiveStartKey?: K }, { LastEvaluatedKey?: K }>,
     itemsFieldName = 'Items',
+    filterFunc?: (entry: T) => boolean,
   ): Promise<T[]> {
     return PromiseUtils.repeat(
       awaitItems(fetchItemsByExclusiveStartKey),
       response => response.LastEvaluatedKey ? { ExclusiveStartKey: response.LastEvaluatedKey } : null,
-      (collection, response: any) => response[itemsFieldName] ? collection.concat(response[itemsFieldName] as Array<T>) : collection,
+      (collection, response: any) => {
+        const entries = response[itemsFieldName] as Array<T>;
+        return Array.isArray(entries) ? collection.concat(filterFunc ? entries.filter((entry) => filterFunc(entry)) : entries) : collection;
+      },
       [] as Array<T>,
     );
   }
