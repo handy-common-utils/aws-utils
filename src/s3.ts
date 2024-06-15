@@ -195,7 +195,7 @@ export async function putS3Object(s3: S3Client, bucket: string, key: string, con
  * @param options Additional options. For example, you can specify content-disposition and content-type in it.
  * @returns An URL that can be used to download the S3 object.
  */
-export async function generatePresignedUrlForDownloading(s3: S3Client, bucket: string, key: string, expiresIn: number, options?: Omit<ConstructorParameters<typeof GetObjectCommand>[0], 'Bucket'|'Key'>): Promise<string> {
+export async function generatePresignedUrlForDownloading(s3: S3Client, bucket: string, key: string, expiresIn?: number, options?: Omit<ConstructorParameters<typeof GetObjectCommand>[0], 'Bucket'|'Key'>): Promise<string> {
   const command = new GetObjectCommand({
     ...options,
     Bucket: bucket,
@@ -210,9 +210,14 @@ export async function generatePresignedUrlForDownloading(s3: S3Client, bucket: s
  * @param bucket Name of the bucket
  * @param key Key of the object
  * @param expiresIn The number of seconds before the presigned URL expires
+ * @param options Additional options
  * @returns An URL that can be used to upload content to the S3 object.
  */
-export async function generatePresignedUrlForUploading(s3: S3Client, bucket: string, key: string, expiresIn: number): Promise<string> {
-  const command = new PutObjectCommand({ Bucket: bucket, Key: key });
+export async function generatePresignedUrlForUploading(s3: S3Client, bucket: string, key: string, expiresIn?: number, options?: Omit<ConstructorParameters<typeof PutObjectCommand>[0], 'Bucket'|'Key'>): Promise<string> {
+  const command = new PutObjectCommand({
+    ...options,
+    Bucket: bucket,
+    Key: key,
+  });
   return getSignedUrl(s3, command, { expiresIn });
 };
