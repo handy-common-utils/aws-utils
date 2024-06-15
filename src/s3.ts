@@ -1,5 +1,6 @@
-import { CopyObjectCommand, CopyObjectCommandOutput, DeleteObjectCommand, DeleteObjectCommandOutput, GetObjectCommand, HeadObjectCommand, HeadObjectCommandOutput, ListObjectsV2Command, ListObjectsV2CommandInput, PutObjectCommand, PutObjectCommandInput, PutObjectOutput, S3Client } from '@aws-sdk/client-s3';
+import { CommonPrefix, CopyObjectCommand, CopyObjectCommandOutput, DeleteObjectCommand, DeleteObjectCommandOutput, GetObjectCommand, HeadObjectCommand, HeadObjectCommandOutput, ListObjectsV2Command, ListObjectsV2CommandInput, ListObjectsV2CommandOutput, PutObjectCommand, PutObjectCommandInput, PutObjectOutput, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { PromiseUtils } from '@handy-common-utils/promise-utils';
 
 import { PossibleAwsError, fetchAllByContinuationToken } from './aws-utils';
 
@@ -141,16 +142,7 @@ export async function getS3ObjectContentByteArray(s3: S3Client, bucket: string, 
   }
 }
 
-export interface S3ObjectSummary {
-  Key: string;
-  /**
-   * Size of the object, it could be zero for directory objects
-   */
-  Size: number;
-  LastModified: Date;
-  ETag: string;
-  StorageClass: string;
-}
+export type S3ObjectSummary = Exclude<ListObjectsV2CommandOutput['Contents'], undefined>[0];
 
 /**
  * Scan S3 bucket and return both normal objects and directory objects.
@@ -166,6 +158,52 @@ export async function scanS3Bucket(s3: S3Client, bucket: string, options?: Parti
     Bucket: bucket,
     ...options,
   })));
+}
+
+/**
+ * Scan S3 bucket and return both normal objects and directory objects.
+ * Directory objects have keys ending with '/'.
+ * This function handles pagination automatically.
+ * @param s3 S3Client
+ * @param bucket Name of the bucket
+ * @param options Optional settings for the scan
+ * @param filterFunc Optional filter function to filter out objects based on certain conditions.
+ *        This function is called for each paged output during pagination.
+ *        For finding few interested objects in a bucket having huge number of object,
+ *        utilising this function can avoid keeping too many useless array entries in memory.
+ * @returns Array of normal and directory objects found
+ */
+export async function listS3Objects(
+  s3: S3Client,
+  bucket: string,
+  options?: Partial<Exclude<ListObjectsV2CommandInput, 'Bucket'|'ContinuationToken'>>,
+  filterFunc?: (entry: S3ObjectSummary|CommonPrefix) => boolean,
+): Promise<{
+  contents: S3ObjectSummary[];
+  commonPrefixes: CommonPrefix[];
+}> {
+  const result = {
+    contents: new Array<S3ObjectSummary>(),
+    commonPrefixes: new Array<CommonPrefix>(),
+  };
+  await PromiseUtils.repeat(
+    () => s3.send(new ListObjectsV2Command({
+      Bucket: bucket,
+      ...options,
+    })),
+    response => response.NextContinuationToken ? { ContinuationToken: response.NextContinuationToken } : null,
+    (collection, response: ListObjectsV2CommandOutput) => {
+      if (response.Contents) {
+        collection.contents.push(...(filterFunc ? response.Contents.filter((entry) => filterFunc(entry)) : response.Contents));
+      }
+      if (response.CommonPrefixes) {
+        collection.commonPrefixes.push(...(filterFunc ? response.CommonPrefixes.filter((entry) => filterFunc(entry)) : response.CommonPrefixes));
+      }
+      return collection;
+    },
+    result,
+  );
+  return result;
 }
 
 /**
