@@ -1,4 +1,4 @@
-import { CommonPrefix, CopyObjectCommand, CopyObjectCommandOutput, DeleteObjectCommand, DeleteObjectCommandOutput, GetObjectCommand, HeadObjectCommand, HeadObjectCommandOutput, ListObjectsV2Command, ListObjectsV2CommandInput, ListObjectsV2CommandOutput, PutObjectCommand, PutObjectCommandInput, PutObjectOutput, S3Client } from '@aws-sdk/client-s3';
+import { CommonPrefix, CopyObjectCommand, CopyObjectCommandInput, CopyObjectCommandOutput, DeleteObjectCommand, DeleteObjectCommandInput, DeleteObjectCommandOutput, GetObjectCommand, GetObjectCommandInput, GetObjectCommandOutput, HeadObjectCommand, HeadObjectCommandInput, HeadObjectCommandOutput, ListObjectsV2Command, ListObjectsV2CommandInput, ListObjectsV2CommandOutput, PutObjectCommand, PutObjectCommandInput, PutObjectOutput, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { PromiseUtils } from '@handy-common-utils/promise-utils';
 
@@ -27,11 +27,13 @@ export function decodeS3ObjectKey(key: string): string {
  * @param s3 S3Client
  * @param bucket bucket name
  * @param key object key (without URL encoding)
+ * @param options Additional options for the DeleteObjectCommand
  * @returns S3 command output
  */
-export async function deleteS3Object(s3: S3Client, bucket: string, key: string): Promise<DeleteObjectCommandOutput> {
+export async function deleteS3Object(s3: S3Client, bucket: string, key: string, options?: Partial<Exclude<DeleteObjectCommandInput, 'Bucket'|'Key'>>): Promise<DeleteObjectCommandOutput> {
   return s3.send(
     new DeleteObjectCommand({
+      ...options,
       Bucket: bucket,
       Key: key,
     }),
@@ -46,11 +48,13 @@ export async function deleteS3Object(s3: S3Client, bucket: string, key: string):
  * @param destDecodedKey key (NOT URL encoded) of the destination object
  * @param metadata metadata to be set on the destination object, if it is not specified then the metadata from source object will be copied
  * @param destBucket bucket of the destination object, if it is not specified then the source bucket will be used
+ * @param options Additional options for the CopyObjectCommand
  * @returns S3 command output
  */
-export async function copyS3Object(s3: S3Client, srcBucket: string, srcEncodedKey: string, destDecodedKey: string, metadata?: Record<string, string>, destBucket?: string): Promise<CopyObjectCommandOutput> {
+export async function copyS3Object(s3: S3Client, srcBucket: string, srcEncodedKey: string, destDecodedKey: string, metadata?: Record<string, string>, destBucket?: string, options?: Partial<Exclude<CopyObjectCommandInput, 'CopySource'|'Bucket'|'Key'|'Metadata'|'MetadataDirective'>>): Promise<CopyObjectCommandOutput> {
   return s3.send(
     new CopyObjectCommand({
+      ...options,
       CopySource: `${srcBucket}/${srcEncodedKey}`,
       Bucket: destBucket || srcBucket,
       Key: destDecodedKey,
@@ -68,12 +72,14 @@ export async function copyS3Object(s3: S3Client, srcBucket: string, srcEncodedKe
  * @param treat403AsNonExisting If this flag is true, then 403 response from AWS is considered as the object does not exist.
  *                              Otherwise, only 404 response from AWS is considered as the object does not exist.
  *                              Background info: If the caller does not have s3:ListBucket permission, AWS responses with 403 when the object does not exists.
+ * @param options Additional options for the HeadObjectCommand
  * @returns S3 command output, or `undefined` if the object does not exist.
  */
-export async function headS3Object(s3: S3Client, bucket: string, key: string, treat403AsNonExisting = false): Promise<HeadObjectCommandOutput | undefined> {
+export async function headS3Object(s3: S3Client, bucket: string, key: string, treat403AsNonExisting = false, options?: Partial<Exclude<HeadObjectCommandInput, 'Bucket'|'Key'>>): Promise<HeadObjectCommandOutput | undefined> {
   try {
     return await s3.send(
       new HeadObjectCommand({
+        ...options,
         Bucket: bucket,
         Key: key,
       }),
@@ -87,19 +93,48 @@ export async function headS3Object(s3: S3Client, bucket: string, key: string, tr
 }
 
 /**
+ * Get the details (including the content) of the S3 object.
+ * @param s3 S3Client
+ * @param bucket bucket of the source object
+ * @param key object key (without URL encoding)
+ * @param options Additional options for the GetObjectCommand
+ * @returns details (including the content) of the S3 object.
+ * If the object does not exist, `undefined` will be returned.
+ */
+export async function getS3Object(s3: S3Client, bucket: string, key: string, options?: Partial<Exclude<GetObjectCommandInput, 'Bucket'|'Key'>>): Promise<GetObjectCommandOutput | undefined> {
+  try {
+    const obj = await s3.send(
+      new GetObjectCommand({
+        ...options,
+        Bucket: bucket,
+        Key: key,
+      }),
+    );
+    return obj;  
+  } catch (error) {
+    if ((error as PossibleAwsError).$metadata?.httpStatusCode === 404) {
+      return undefined;
+    }
+    throw error;
+  }
+}
+
+/**
  * Get the content of the S3 object as a string.
  * @param s3 S3Client
  * @param bucket bucket of the source object
  * @param key object key (without URL encoding)
  * @param encoding Text encoding of the content, if not specified then "utf8" will be used
+ * @param options Additional options for the GetObjectCommand
  * @returns Content of the S3 object as a string.
  * If the object does not have content, an empty string will be returned.
  * If the object does not exist, `undefined` will be returned.
  */
-export async function getS3ObjectContentString(s3: S3Client, bucket: string, key: string, encoding = 'utf8'): Promise<string | undefined> {
+export async function getS3ObjectContentString(s3: S3Client, bucket: string, key: string, encoding = 'utf8', options?: Partial<Exclude<GetObjectCommandInput, 'Bucket'|'Key'>>): Promise<string | undefined> {
   try {
     const data = await s3.send(
       new GetObjectCommand({
+        ...options,
         Bucket: bucket,
         Key: key,
       }),
@@ -119,15 +154,16 @@ export async function getS3ObjectContentString(s3: S3Client, bucket: string, key
  * @param bucket bucket of the source object
  * @param key object key (without URL encoding)
  * @param range See https://www.rfc-editor.org/rfc/rfc9110.html#name-range
- * @param encoding Text encoding of the content, if not specified then "utf8" will be used
+ * @param options Additional options for the GetObjectCommand
  * @returns Content of the S3 object as a Uint8Array.
  * If the object does not have content, an empty Uint8Array will be returned.
  * If the object does not exist, `undefined` will be returned.
  */
-export async function getS3ObjectContentByteArray(s3: S3Client, bucket: string, key: string, range?: string): Promise<Uint8Array | undefined> {
+export async function getS3ObjectContentByteArray(s3: S3Client, bucket: string, key: string, range?: string, options?: Partial<Exclude<GetObjectCommandInput, 'Bucket'|'Key'|'Range'>>): Promise<Uint8Array | undefined> {
   try {
     const data = await s3.send(
       new GetObjectCommand({
+        ...options,
         Bucket: bucket,
         Key: key,
         Range: range,
@@ -224,10 +260,10 @@ export async function listS3Objects(
  */
 export async function putS3Object(s3: S3Client, bucket: string, key: string, content: PutObjectCommandInput['Body'], options?: Partial<Exclude<PutObjectCommandInput, 'Bucket'>>): Promise<PutObjectOutput> {
   return await s3.send(new PutObjectCommand({
+    ...options,
     Bucket: bucket,
     Key: key,
     Body: content,
-    ...options,
   }));
 }
 
