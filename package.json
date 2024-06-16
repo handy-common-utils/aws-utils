@@ -43,7 +43,7 @@
   },
   "bin": {},
   "dependencies": {
-    "@handy-common-utils/promise-utils": "^1.4.1",
+    "@handy-common-utils/promise-utils": "^1.5.0",
     "@unbounce/parse-aws-arn": "^1.2.2"
   },
   "optionalDependencies": {
