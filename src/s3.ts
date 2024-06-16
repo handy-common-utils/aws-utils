@@ -2,7 +2,7 @@ import { CommonPrefix, CopyObjectCommand, CopyObjectCommandInput, CopyObjectComm
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { PromiseUtils } from '@handy-common-utils/promise-utils';
 
-import { PossibleAwsError, fetchAllByContinuationToken } from './aws-utils';
+import { awsErrorStatusCode, fetchAllByContinuationToken, isPossibleAwsError } from './aws-utils';
 
 /**
  * URL encode the object key, and also replace "%20" with " " and "%2F with "/" which is the convention of AWS
@@ -85,7 +85,11 @@ export async function headS3Object(s3: S3Client, bucket: string, key: string, tr
       }),
     );
   } catch (error) {
-    if ((error as PossibleAwsError).$metadata?.httpStatusCode === 404 || treat403AsNonExisting && (error as PossibleAwsError).$metadata?.httpStatusCode === 403) {
+    if (!isPossibleAwsError(error)) {
+      throw error;
+    }
+    const statusCode = awsErrorStatusCode(error);
+    if (statusCode === 404 || treat403AsNonExisting && statusCode === 403) {
       return undefined;
     }
     throw error;
@@ -112,7 +116,10 @@ export async function getS3Object(s3: S3Client, bucket: string, key: string, opt
     );
     return obj;  
   } catch (error) {
-    if ((error as PossibleAwsError).$metadata?.httpStatusCode === 404) {
+    if (!isPossibleAwsError(error)) {
+      throw error;
+    }
+    if (awsErrorStatusCode(error) === 404) {
       return undefined;
     }
     throw error;
@@ -141,7 +148,10 @@ export async function getS3ObjectContentString(s3: S3Client, bucket: string, key
     );
     return data?.Body ? data.Body.transformToString(encoding) : '';  
   } catch (error) {
-    if ((error as PossibleAwsError).$metadata?.httpStatusCode === 404) {
+    if (!isPossibleAwsError(error)) {
+      throw error;
+    }
+    if (awsErrorStatusCode(error) === 404) {
       return undefined;
     }
     throw error;
@@ -171,7 +181,10 @@ export async function getS3ObjectContentByteArray(s3: S3Client, bucket: string, 
     );
     return data?.Body ? data.Body.transformToByteArray(): new Uint8Array();
   } catch (error) {
-    if ((error as PossibleAwsError).$metadata?.httpStatusCode === 404) {
+    if (!isPossibleAwsError(error)) {
+      throw error;
+    }
+    if (awsErrorStatusCode(error) === 404) {
       return undefined;
     }
     throw error;
