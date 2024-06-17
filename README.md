@@ -646,6 +646,26 @@ true if it could be an error thrown from AWS SDK v2 or v3
 
 ___
 
+##### isPossibleAwsThrottlingError
+
+▸ **isPossibleAwsThrottlingError**(`error`): error is PossibleAwsError
+
+Check whether the error thrown from AWS SDK v2 or v3 is a throttling error.
+
+###### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `error` | `any` | AWS error |
+
+###### Returns
+
+error is PossibleAwsError
+
+true if it is a throttling error
+
+___
+
 ##### isPossibleAwsV2Error
 
 ▸ **isPossibleAwsV2Error**(`error`): error is PossibleAwsV2Error
