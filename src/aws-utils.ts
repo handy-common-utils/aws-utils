@@ -144,6 +144,15 @@ export function awsErrorRetryable(error: PossibleAwsError): boolean {
   return (error as PossibleAwsV3Error).$retryable?.throttling ?? (error as PossibleAwsV2Error).retryable ?? false;
 }
 
+/**
+ * Check whether the error thrown from AWS SDK v2 or v3 is a throttling error.
+ * @param error AWS error
+ * @returns true if it is a throttling error
+ */
+export function isPossibleAwsThrottlingError(error: any): error is PossibleAwsError {
+  return isPossibleAwsV3Error(error) && error.name === 'ThrottlingException' || isPossibleAwsV2Error(error) && error.code === 'ThrottlingException';
+}
+
 
 type PartialConfigurationOptions = {
   /**
