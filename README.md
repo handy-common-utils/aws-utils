@@ -992,6 +992,8 @@ ___
 ▸ **putS3Object**(`s3`, `bucket`, `key`, `content`, `options?`): `Promise`\<`PutObjectOutput`\>
 
 Store content into S3.
+Please note that the type of the content parameter can't be a Readable (stream) with unknown length.
+For uploading stream with unknown length, use `uploadS3Object(...)` instead.
 
 ###### Parameters
 
@@ -1033,6 +1035,28 @@ This function handles pagination automatically.
 `Promise`\<[`S3ObjectSummary`](#s3objectsummary)[]\>
 
 Array of normal and directory objects found
+
+___
+
+##### uploadS3Object
+
+▸ **uploadS3Object**(`s3`, `bucket`, `key`, `content`, `options?`, `uploadOptions?`, `setupCallback?`): `Promise`\<`void`\>
+
+###### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `s3` | `S3Client` |
+| `bucket` | `string` |
+| `key` | `string` |
+| `content` | `undefined` \| `StreamingBlobPayloadInputTypes` |
+| `options?` | `Partial`\<`PutObjectCommandInput`\> |
+| `uploadOptions?` | `Partial`\<`Options`\> |
+| `setupCallback?` | (`upload`: `Upload`) => `void` |
+
+###### Returns
+
+`Promise`\<`void`\>
 
 
 <a name="modulesssmmd"></a>
