@@ -1,3 +1,5 @@
+import type { Upload } from '@aws-sdk/lib-storage';
+
 import { CommonPrefix, CopyObjectCommand, CopyObjectCommandInput, CopyObjectCommandOutput, DeleteObjectCommand, DeleteObjectCommandInput, DeleteObjectCommandOutput, GetObjectCommand, GetObjectCommandInput, GetObjectCommandOutput, HeadObjectCommand, HeadObjectCommandInput, HeadObjectCommandOutput, ListObjectsV2Command, ListObjectsV2CommandInput, ListObjectsV2CommandOutput, PutObjectCommand, PutObjectCommandInput, PutObjectOutput, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { PromiseUtils } from '@handy-common-utils/promise-utils';
@@ -264,6 +266,8 @@ export async function listS3Objects(
 
 /**
  * Store content into S3.
+ * Please note that the type of the content parameter can't be a Readable (stream) with unknown length.
+ * For uploading stream with unknown length, use `uploadS3Object(...)` instead.
  * @param s3 S3Client
  * @param bucket Name of the bucket
  * @param key Key of the object
@@ -271,13 +275,39 @@ export async function listS3Objects(
  * @param options Additional options
  * @returns PutObjectOutput
  */
-export async function putS3Object(s3: S3Client, bucket: string, key: string, content: PutObjectCommandInput['Body'], options?: Partial<Exclude<PutObjectCommandInput, 'Bucket'>>): Promise<PutObjectOutput> {
+export async function putS3Object(s3: S3Client, bucket: string, key: string, content: PutObjectCommandInput['Body'], options?: Partial<Exclude<PutObjectCommandInput, 'Bucket'|'Key'|'Body'>>): Promise<PutObjectOutput> {
   return await s3.send(new PutObjectCommand({
     ...options,
     Bucket: bucket,
     Key: key,
     Body: content,
   }));
+}
+
+export async function uploadS3Object(
+  s3: S3Client,
+  bucket: string,
+  key: string,
+  content: ConstructorParameters<typeof Upload>[0]['params']['Body'],
+  options?: Partial<Exclude<PutObjectCommandInput, 'Bucket'|'Key'|'Body'>>,
+  uploadOptions?: Partial<Exclude<ConstructorParameters<typeof Upload>[0], 'params'|'client'>>,
+  setupCallback?: (upload: Upload) => void,
+): Promise<void> {
+  const { Upload: PUpload } = await import('@aws-sdk/lib-storage');
+  const upload = new PUpload({
+    ...uploadOptions,
+    params: {
+      ...options,
+      Bucket: bucket,
+      Key: key,
+      Body: content,
+    },
+    client: s3,
+  });
+  if (setupCallback) {
+    setupCallback(upload);
+  }
+  await upload.done();
 }
 
 /**

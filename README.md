@@ -54,6 +54,12 @@ await deleteS3Object(s3, bucket, srcKey);
 To use S3 related utilities, you need to add `@aws-sdk/client-s3` as a dependency of your project
 because it is not included as a dependency of this package.
 
+For uploading content to S3, there are two functions available.
+`putS3Object(...)` is simpler but can't handle stream content with unknown length.
+`uploadS3Object(...)` can handle stream content and supports concurrent uploading.
+
+If you need `uploadS3Object(...)`, remember to also add `@aws-sdk/lib-storage` as a dependency of your project.
+
 ### SSM
 
 SSM related utility functions can be imported and used in this way:
