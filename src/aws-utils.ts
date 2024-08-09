@@ -476,8 +476,10 @@ export abstract class AwsUtils {
    * This function is quite handy when you are using AWS SDK v3.
    * If you are using AWS SDK v2, `promiseWithRetry(...)` could be more convenient.
    * 
-   * The retry would happen only if the error coming from AWS has property `retryable`/`$retryable.throttling` equals to true.
-   * If you don't want `retryable`/`$retryable.throttling` property to be checked, use `PromiseUtils.withRetry(...)` directly.
+   * The retry would happen when the error coming from AWS indicates HTTP status code 429, and
+   * has property `retryable`/`$retryable.throttling` equals to true
+   * or property `name`/`code` equals to "ThrottlingException".
+   * If you want to customise the retry logic, use `PromiseUtils.withRetry(...)` directly.
    * @see promiseWithRetry
    * @param operation the AWS operation that returns a Promise, such like `() => apig.getBasePathMappings({ domainName, limit: 500 }).promise()`
    * @param backoff Array of retry backoff periods (unit: milliseconds) or function for calculating them.
@@ -489,7 +491,7 @@ export abstract class AwsUtils {
    *                If omitted or undefined, a default backoff array will be used.
    *                In case AWS has `retryDelay` property in the returned error, the larger one between `retryDelay` and the backoff will be used.
    * @param statusCodes Array of status codes for which retry should be done.
-   *                    If omitted or undefined, only 429 status code would result in a retry.
+   *                    If omitted or undefined, only 429 status code could result in a retry.
    *                    If it is null, status code would not be looked into.
    *                    If it is an empty array, retry would never happen.
    * @returns result came out from the last attempt
@@ -510,7 +512,7 @@ export abstract class AwsUtils {
       if (!isPossibleAwsError(previousError)) {
         return false;
       }
-      const isRetryable = awsErrorRetryable(previousError);
+      const isRetryable = awsErrorRetryable(previousError) || isPossibleAwsThrottlingError(previousError);
       const statusCode = awsErrorStatusCode(previousError);
       return isRetryable === true && (statusCodes == null || statusCodes.includes(statusCode));
     });
@@ -521,8 +523,10 @@ export abstract class AwsUtils {
    * This function is quite handy when you are using AWS SDK v2.
    * If you are using AWS SDK v3, use `withRetry(...)` instead.
    *
-   * The retry would happen only if the error coming from AWS has property `retryable`/`$retryable.throttling` equals to true.
-   * If you don't want `retryable`/`$retryable.throttling` property to be checked, use `PromiseUtils.withRetry(...)` directly.
+   * The retry would happen when the error coming from AWS indicates HTTP status code 429, and
+   * has property `retryable`/`$retryable.throttling` equals to true
+   * or property `name`/`code` equals to "ThrottlingException".
+   * If you want to customise the retry logic, use `PromiseUtils.withRetry(...)` directly.
    * @param operation the AWS operation that returns a Request, such like `() => apig.getBasePathMappings({ domainName, limit: 500 })`
    * @param backoff Array of retry backoff periods (unit: milliseconds) or function for calculating them.
    *                If retry is desired, before making next call to the operation the desired backoff period would be waited.
@@ -532,7 +536,7 @@ export abstract class AwsUtils {
    *                If omitted or undefined, a default backoff array will be used.
    *                In case AWS has `retryDelay` property in the returned error, the larger one between `retryDelay` and the backoff will be used.
    * @param statusCodes Array of status codes for which retry should be done.
-   *                    If omitted or undefined, only 429 status code would result in a retry.
+   *                    If omitted or undefined, only 429 status code could result in a retry.
    *                    If it is null, status code would not be looked into.
    *                    If it is an empty array, retry would never happen.
    * @returns result came out from the last attempt
