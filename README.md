@@ -472,8 +472,10 @@ Perform an AWS operation (returning a Request) with retry.
 This function is quite handy when you are using AWS SDK v2.
 If you are using AWS SDK v3, use `withRetry(...)` instead.
 
-The retry would happen only if the error coming from AWS has property `retryable`/`$retryable.throttling` equals to true.
-If you don't want `retryable`/`$retryable.throttling` property to be checked, use `PromiseUtils.withRetry(...)` directly.
+The retry would happen when the error coming from AWS indicates HTTP status code 429, and
+has property `retryable`/`$retryable.throttling` equals to true
+or property `name`/`code` equals to "ThrottlingException".
+If you want to customise the retry logic, use `PromiseUtils.withRetry(...)` directly.
 
 ###### Type parameters
 
@@ -488,7 +490,7 @@ If you don't want `retryable`/`$retryable.throttling` property to be checked, us
 | :------ | :------ | :------ |
 | `operation` | (`attempt`: `number`, `previousResult`: `undefined` \| `Result`, `previousError`: `undefined` \| `TError`) => `WithPromiseFunction`\<`Result`\> | the AWS operation that returns a Request, such like `() => apig.getBasePathMappings({ domainName, limit: 500 })` |
 | `backoff?` | `number`[] \| (`attempt`: `number`, `previousResult`: `undefined` \| `Result`, `previousError`: `undefined` \| `TError`) => `undefined` \| `number` | Array of retry backoff periods (unit: milliseconds) or function for calculating them. If retry is desired, before making next call to the operation the desired backoff period would be waited. If the array runs out of elements or the function returns `undefined`, there would be no further call to the operation. The `attempt` argument passed into backoff function starts from 2 because only retries need to backoff, so the first retry is the second attempt. If omitted or undefined, a default backoff array will be used. In case AWS has `retryDelay` property in the returned error, the larger one between `retryDelay` and the backoff will be used. |
-| `statusCodes?` | ``null`` \| (`undefined` \| `number`)[] | Array of status codes for which retry should be done. If omitted or undefined, only 429 status code would result in a retry. If it is null, status code would not be looked into. If it is an empty array, retry would never happen. |
+| `statusCodes?` | ``null`` \| (`undefined` \| `number`)[] | Array of status codes for which retry should be done. If omitted or undefined, only 429 status code could result in a retry. If it is null, status code would not be looked into. If it is an empty array, retry would never happen. |
 
 ###### Returns
 
@@ -506,8 +508,10 @@ Perform an AWS operation (returning a Promise) with retry.
 This function is quite handy when you are using AWS SDK v3.
 If you are using AWS SDK v2, `promiseWithRetry(...)` could be more convenient.
 
-The retry would happen only if the error coming from AWS has property `retryable`/`$retryable.throttling` equals to true.
-If you don't want `retryable`/`$retryable.throttling` property to be checked, use `PromiseUtils.withRetry(...)` directly.
+The retry would happen when the error coming from AWS indicates HTTP status code 429, and
+has property `retryable`/`$retryable.throttling` equals to true
+or property `name`/`code` equals to "ThrottlingException".
+If you want to customise the retry logic, use `PromiseUtils.withRetry(...)` directly.
 
 ###### Type parameters
 
@@ -522,7 +526,7 @@ If you don't want `retryable`/`$retryable.throttling` property to be checked, us
 | :------ | :------ | :------ |
 | `operation` | (`attempt`: `number`, `previousResult`: `undefined` \| `Result`, `previousError`: `undefined` \| `TError`) => `Promise`\<`Result`\> | the AWS operation that returns a Promise, such like `() => apig.getBasePathMappings({ domainName, limit: 500 }).promise()` |
 | `backoff` | `number`[] \| (`attempt`: `number`, `previousResult`: `undefined` \| `Result`, `previousError`: `undefined` \| `TError`) => `undefined` \| `number` | Array of retry backoff periods (unit: milliseconds) or function for calculating them. If retry is desired, before making next call to the operation the desired backoff period would be waited. If the array runs out of elements or the function returns `undefined` or either the array or the function returns a negative number, there would be no further call to the operation. The `attempt` argument passed into backoff function starts from 2 because only retries need to backoff, so the first retry is the second attempt. If omitted or undefined, a default backoff array will be used. In case AWS has `retryDelay` property in the returned error, the larger one between `retryDelay` and the backoff will be used. |
-| `statusCodes` | ``null`` \| (`undefined` \| `number`)[] | Array of status codes for which retry should be done. If omitted or undefined, only 429 status code would result in a retry. If it is null, status code would not be looked into. If it is an empty array, retry would never happen. |
+| `statusCodes` | ``null`` \| (`undefined` \| `number`)[] | Array of status codes for which retry should be done. If omitted or undefined, only 429 status code could result in a retry. If it is null, status code would not be looked into. If it is an empty array, retry would never happen. |
 
 ###### Returns
 
