@@ -209,8 +209,9 @@ export type S3ObjectSummary = Exclude<ListObjectsV2CommandOutput['Contents'], un
  * @returns Array of normal and directory objects found
  */
 export async function scanS3Bucket(s3: S3Client, bucket: string, options?: Partial<Exclude<ListObjectsV2CommandInput, 'Bucket'|'ContinuationToken'>>, filterFunc?: (entry: S3ObjectSummary) => boolean): Promise<Array<S3ObjectSummary>> {
-  return await fetchAllByContinuationToken(() => s3.send(new ListObjectsV2Command({
+  return await fetchAllByContinuationToken((paginationOptions) => s3.send(new ListObjectsV2Command({
     Bucket: bucket,
+    ...paginationOptions,
     ...options,
   })),
   'Contents',
