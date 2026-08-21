@@ -7,7 +7,7 @@
     "**/*.spec.ts"
   ],
   "compilerOptions": {
-    "lib": ["es2022"],
+    "lib": ["es2021" ],
     "target": "es2017",
     "module": "nodenext",
     "moduleResolution": "node16",
