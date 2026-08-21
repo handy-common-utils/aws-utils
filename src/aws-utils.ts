@@ -196,7 +196,6 @@ export abstract class AwsUtils {
    * @param endpoint if omitted, the endpoint will be 'http://localhost:8000' which is the default
    * @returns the options object
    */
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   static dynamodbLocalClientOptions(endpoint = 'http://localhost:8000') {
     return {
       endpoint,
@@ -310,7 +309,7 @@ export abstract class AwsUtils {
    *        utilising this function can avoid keeping too many useless array entries in memory.
    * @returns all items fetched
    */
-  static async fetchAllWithPagination<IT, RT extends Record<IFN, IT[]|undefined> & Partial<Record<PFN, PFT>>, IFN extends string, PFN extends string, PFT = string>(
+  static async fetchAllWithPagination<IT, RT extends Partial<Record<PFN, PFT>> & Record<IFN, IT[]|undefined>, IFN extends string, PFN extends string, PFT = string>(
     fetchOnePageOfItems: FetchItemsFunction<Partial<Record<PFN, PFT>>, RT>,
     itemsFieldName: IFN,
     paginationFieldName: PFN,
@@ -507,7 +506,7 @@ export abstract class AwsUtils {
         return backoffMs;
       }
       const awsRetryDelayMs = awsRetryDelaySec * 1000;
-      return awsRetryDelayMs > backoffMs ? awsRetryDelayMs : backoffMs;
+      return Math.max(awsRetryDelayMs, backoffMs);
     }, (previousError: TError | undefined) => {
       if (!isPossibleAwsError(previousError)) {
         return false;

@@ -285,6 +285,16 @@ export async function putS3Object(s3: S3Client, bucket: string, key: string, con
   }));
 }
 
+/**
+ * Upload an object to S3.
+ * @param s3 the S3Client instance
+ * @param bucket Name of the bucket
+ * @param key Key of the object
+ * @param content Content of the object
+ * @param options Additional options
+ * @param uploadOptions Upload options
+ * @param setupCallback Callback to setup the upload instance
+ */
 export async function uploadS3Object(
   s3: S3Client,
   bucket: string,
